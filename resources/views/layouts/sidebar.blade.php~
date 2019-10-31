@@ -1,0 +1,36 @@
+<aside class="main-sidebar">
+
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <!-- Sidebar Menu -->
+        <ul class="sidebar-menu" data-widget="tree">
+            <!--            <li class="header">HEADER</li>-->
+            <!-- Optionally, you can add icons to the links -->
+            <!--            <li class="active"><a href="{{url('/home')}}"><i class="fa fa-link"></i> <span>游戏管理</span></a></li>-->
+            <!--            <li><a href="#"><i class="fa fa-link"></i> <span>Another Link</span></a></li>-->
+            <li class="active treeview">
+                <a href="#"><i class="fa fa-user"></i> <span>机器人管理</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li><a href="{{url('robots/index')}}">机器人列表</a></li>
+                </ul>
+            </li>
+            <li class="active treeview">
+                <a href="#"><i class="fa fa-link"></i> <span>好友管理</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li><a href="{{url('friend/auto')}}">加好友自动应答</a></li>
+                    <li><a href="{{url('friend/auto')}}">私聊自动回复</a></li>
+                </ul>
+            </li>
+        </ul>
+        <!-- /.sidebar-menu -->
+    </section>
+    <!-- /.sidebar -->
+</aside>

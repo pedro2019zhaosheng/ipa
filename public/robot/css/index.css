@@ -1,0 +1,44 @@
+html {
+    font-family: 'Helvetica Neue', Helvetica, sans-serif;
+    display: block;
+    background: #fff;
+    min-height: 100vh;
+    -webkit-overflow-scrolling: touch; }
+  
+  blockquote,
+  body,
+  code,
+  dd,
+  div,
+  dl,
+  dt,
+  fieldset,
+  form,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  input,
+  legend,
+  li,
+  ol,
+  p,
+  pre,
+  select,
+  td,
+  textarea,
+  th,
+  ul {
+    margin: 0;
+    padding: 0;
+    font-style: normal;
+    outline: none;
+    border: none; }
+  
+  body {
+    display: block;
+}
+  
+ 

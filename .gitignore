@@ -1,0 +1,6 @@
+/resources/static
+/resources/views/templates_c
+logs
+/vendor
+/.idea
+.env

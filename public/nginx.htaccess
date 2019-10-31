@@ -1,0 +1,51 @@
+#此文件为Nginx的伪静态文件  PHPWAMP官方网址：http://www.phpwamp.com    http://www.lccee.com
+
+
+
+
+
+# 将以下是301跳转设置，请自定修改为您的域名
+ if ($Host = 'xxx.com'){
+ rewrite ^/(.*)$ http://www.phpwamp.com/$1 permanent;
+                 }
+
+
+
+
+
+
+#以下为phpwind9.0伪静态规则,去掉下面的#即可生效
+#------------------------------------------------------------------------------------------------
+
+# if (-f $request_filename) {
+#           break;
+#   }
+#    if ($request_filename ~* "\.(js|ico|gif|jpe?g|bmp|png|css)$") {
+#       break;
+#   }
+#   if (!-e $request_filename) {
+#       rewrite . /index.php last;
+#   }
+
+
+
+
+
+# 这个是ThinkPHP V5伪静态规则示例 请去掉以下代码前边的#号即可生效
+
+#------------------------------------------------------------------------------------------------
+#if (!-e $request_filename) {
+#   rewrite  ^(.*)$  /index.php?s=/$1  last;
+#   break;
+#    }
+
+#------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
