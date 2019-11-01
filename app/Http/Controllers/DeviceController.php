@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
 use App\Models\Friend;
-use App\Models\FriendCircle;
+use App\Models\Device;
 
 class DeviceController extends AppBaseController
 {
@@ -38,36 +38,15 @@ class DeviceController extends AppBaseController
 
         $where = [];
         if(!empty($request->name)){
-            $where[] = ['nickname','like','%'.$request->name.'%'];
+            $where[] = ['udid','like','%'.$request->name.'%'];
         }
-        $robots = Robot::where($where)->where($this->condition())->paginate(10);
+        $robots = Device::where($where)->paginate(10);
         $robots->appends(array(
             'page' => $request->page,
             'name' => $request->name,
         ));
-        foreach($robots as &$v){
-            //是否设置好友
-            $friend = Friend::whereIn('type',[1,2,3,4,5])->where('robot_id',$v->id)->first();
-            $friend_config = 0;
-            if($friend){
-                $friend_config = 1;
-            }
-            $v->friend_config = $friend_config;
-            //是否设置朋友圈
-            $circle =FriendCircle::whereIn('type',[1])->where('robot_id',$v->id)->first();
-            $circle_config = 0;
-            if($circle){
-                $circle_config = 1;
-            }
-            $v->circle_config = $circle_config;
-            //是否设置群管理
-            $v->group_config = 0;
-            //是否设置机器人配置
-            $v->robot_config = 1;
-
-        }
-        return view('apple.index')
-            ->with('apple', $robots);
+        return view('device.index')
+            ->with('device', $robots);
     }
 
     /**
@@ -80,7 +59,7 @@ class DeviceController extends AppBaseController
         //todo 二维码
         $qrcode = "https://tvax4.sinaimg.cn/crop.0.0.1125.1125.180/49282834ly8fvi8ifbnz4j20v90v9tau.jpg?KID=imgbed,tva&Expires=1567774272&ssig=aGCljOl9Zz";
         $qrcode= "http://47.91.251.232:8892/qr_image.png";
-        return view('robots.create')->with('qrcode',$qrcode);
+        return view('device.create')->with('qrcode',$qrcode);
     }
 
     /**
@@ -92,16 +71,27 @@ class DeviceController extends AppBaseController
      */
     public function store(CreateRobotRequest $request)
     {
-        $input = $request->all();
-        $data = [
-            'user_id'=>$this->authUserInfo()->id,
-            'device_id'=>$input['device_id']
-        ];
-        Robot::insert($data);
 
-        Flash::success('机器人创建成功');
+        $data = $request->all();
+      
+        if(!isset($data['udid'])){
+            Flash::error("苹果设备udid不能为空");
+            return redirect(url('/device/create'));
+        }
+      
+        $device = [
+                'udid'=>$data['udid'],
+            ];
+        if($data['id']>0){
+            Device::where(['id'=>$data['id']])->update($device);
+        }else{
+            Device::insert($device);
+        }
+       
+      
+        Flash::success('设备创建成功');
 
-        return redirect(route('robots.index'));
+        return redirect(url('device/device'));
     }
 
     /**
@@ -132,15 +122,14 @@ class DeviceController extends AppBaseController
      */
     public function edit($id)
     {
-        $robot = $this->robotRepository->findWithoutFail($id);
+        $device = Device::where(['id'=>$id])->first();
 
-        if (empty($robot)) {
-            Flash::error('机器人未找到');
+        if (empty($device)) {
+            Flash::error('苹果设备号未找到');
 
-            return redirect(route('robots.index'));
+            return redirect(route('device.index'));
         }
-
-        return view('robots.edit')->with('robot', $robot);
+        return view('device.create')->with('device', $device);
     }
 
     /**
@@ -177,19 +166,19 @@ class DeviceController extends AppBaseController
      */
     public function destroy($id)
     {
-        $game = $this->robotRepository->findWithoutFail($id);
+        $device = Device::where(['id'=>$id])->first();
 
-        if (empty($game)) {
-            Flash::error('机器人未找到');
+        if (empty($device)) {
+            Flash::error('apple设备未找到');
 
-            return redirect(route('robots.index'));
+            return redirect(url('device/device'));
         }
 
-        $this->robotRepository->delete($id);
+        Device::where(['id'=>$id])->delete();
 
-        Flash::success('Game deleted successfully.');
+        Flash::success('Device No deleted successfully.');
 
-        return redirect(route('robots.index'));
+        return redirect(url('device/device'));
     }
 
 //    public function search(Request $request)

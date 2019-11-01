@@ -1,8 +1,8 @@
 <div class="box box-primary">
     <div class="box-body">
-        {!! Form::open(['url' => 'robots','method'=>'GET']) !!}
+        {!! Form::open(['url' => 'apple/apple','method'=>'GET']) !!}
         <div class="form-group col-sm-5">
-            {!! Form::label('name', '微信昵称:') !!}
+            {!! Form::label('name', '账号:') !!}
             <label class="checkbox-inline">
             {!! Form::text('name', null, ['class' => 'form-control']) !!}
             </label>
@@ -19,7 +19,7 @@
         <label class="checkbox-inline">
             {!! Form::submit('搜索', ['class' => 'btn btn-primary pull-right']) !!}
         </label>
-             <a class="btn btn-primary pull-right" style="margin-right:400px;margin-top: 0px;margin-bottom: 5px" href="{!! route('robots.create') !!}">添加
+             <a class="btn btn-primary pull-right" style="margin-right:400px;margin-top: 0px;margin-bottom: 5px" href="{!! url('apple/create') !!}">添加
              </a>
 
         </div>

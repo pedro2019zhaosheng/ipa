@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
 use App\Models\Friend;
-use App\Models\FriendCircle;
+use App\Models\Apple;
 
 class AppleController extends AppBaseController
 {
@@ -38,34 +38,13 @@ class AppleController extends AppBaseController
 
         $where = [];
         if(!empty($request->name)){
-            $where[] = ['nickname','like','%'.$request->name.'%'];
+            $where[] = ['account','like','%'.$request->name.'%'];
         }
-        $robots = Robot::where($where)->where($this->condition())->paginate(10);
+        $robots = Apple::where($where)->paginate(10);
         $robots->appends(array(
             'page' => $request->page,
             'name' => $request->name,
         ));
-        foreach($robots as &$v){
-            //是否设置好友
-            $friend = Friend::whereIn('type',[1,2,3,4,5])->where('robot_id',$v->id)->first();
-            $friend_config = 0;
-            if($friend){
-                $friend_config = 1;
-            }
-            $v->friend_config = $friend_config;
-            //是否设置朋友圈
-            $circle =FriendCircle::whereIn('type',[1])->where('robot_id',$v->id)->first();
-            $circle_config = 0;
-            if($circle){
-                $circle_config = 1;
-            }
-            $v->circle_config = $circle_config;
-            //是否设置群管理
-            $v->group_config = 0;
-            //是否设置机器人配置
-            $v->robot_config = 1;
-
-        }
         return view('apple.index')
             ->with('apple', $robots);
     }
@@ -80,7 +59,7 @@ class AppleController extends AppBaseController
         //todo 二维码
         $qrcode = "https://tvax4.sinaimg.cn/crop.0.0.1125.1125.180/49282834ly8fvi8ifbnz4j20v90v9tau.jpg?KID=imgbed,tva&Expires=1567774272&ssig=aGCljOl9Zz";
         $qrcode= "http://47.91.251.232:8892/qr_image.png";
-        return view('robots.create')->with('qrcode',$qrcode);
+        return view('apple.create')->with('qrcode',$qrcode);
     }
 
     /**
@@ -92,16 +71,36 @@ class AppleController extends AppBaseController
      */
     public function store(CreateRobotRequest $request)
     {
+
+        $data = $request->all();
+        if(!isset($data['account'])){
+            Flash::error("苹果账号不能为空");
+            return redirect(url('/apple/create'));
+        }
+        if(!isset($data['secret_key'])){
+            Flash::error("苹果账号密码不能为空");
+            return redirect(url('/apple/create'));
+        }
+        $filename = $this->uploadFile($request);
         $input = $request->all();
-        $data = [
-            'user_id'=>$this->authUserInfo()->id,
-            'device_id'=>$input['device_id']
-        ];
-        Robot::insert($data);
+        if(!$filename){
+            $filename = $data['p12_url'];
+        }
+        $apple = [
+                'account'=>$data['account'],
+                'secret_key'=>$data['secret_key'],
+                'p12_url'=>$filename,
+            ];
+        if($data['id']>0){
+            Apple::where(['id'=>$data['id']])->update($apple);
+        }else{
+            Apple::insert($apple);
+        }
+       
+      
+        Flash::success('苹果账号创建成功');
 
-        Flash::success('机器人创建成功');
-
-        return redirect(route('robots.index'));
+        return redirect(url('apple/apple'));
     }
 
     /**
@@ -132,15 +131,14 @@ class AppleController extends AppBaseController
      */
     public function edit($id)
     {
-        $robot = $this->robotRepository->findWithoutFail($id);
+        $apple = Apple::where(['id'=>$id])->first();
 
-        if (empty($robot)) {
-            Flash::error('机器人未找到');
+        if (empty($apple)) {
+            Flash::error('苹果账号未找到');
 
-            return redirect(route('robots.index'));
+            return redirect(route('apple.index'));
         }
-
-        return view('robots.edit')->with('robot', $robot);
+        return view('apple.create')->with('apple', $apple);
     }
 
     /**
@@ -177,19 +175,19 @@ class AppleController extends AppBaseController
      */
     public function destroy($id)
     {
-        $game = $this->robotRepository->findWithoutFail($id);
+        $apple = Apple::where(['id'=>$id])->first();
 
-        if (empty($game)) {
-            Flash::error('机器人未找到');
+        if (empty($apple)) {
+            Flash::error('apple账号未找到');
 
-            return redirect(route('robots.index'));
+            return redirect(url('apple/apple'));
         }
 
-        $this->robotRepository->delete($id);
+        Apple::where(['id'=>$id])->delete();
 
-        Flash::success('Game deleted successfully.');
+        Flash::success('apple account deleted successfully.');
 
-        return redirect(route('robots.index'));
+        return redirect(url('apple/apple'));
     }
 
 //    public function search(Request $request)

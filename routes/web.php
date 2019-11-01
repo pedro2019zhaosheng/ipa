@@ -20,8 +20,25 @@ Route::get('logout', 'Auth\LoginController@logout');
 
 Route::group(['middleware' => ['check_login']], function () {
     Route::get('/home', 'HomeController@index')->name('home');
-
+    //apple
     Route::get('/apple/apple','AppleController@apple')->name('apple');
+    Route::get('/apple/create','AppleController@create')->name('apple.create');
+    Route::post('/apple/store','AppleController@store')->name('apple.store');
+    Route::get('/apple/destroy/{id}','AppleController@destroy')->name('apple.destroy');
+    Route::get('/apple/edit/{id}','AppleController@edit')->name('apple.edit');
+    //device
+    Route::get('/device/device','DeviceController@device')->name('device');
+    Route::get('/device/create','DeviceController@create')->name('device.create');
+    Route::post('/device/store','DeviceController@store')->name('device.store');
+    Route::get('/device/destroy/{id}','DeviceController@destroy')->name('device.destroy');
+    Route::get('/device/edit/{id}','DeviceController@edit')->name('device.edit');
+    //package
+    Route::get('/package/package','PackageController@package')->name('package');
+    Route::get('/package/create','PackageController@create')->name('package.create');
+    Route::post('/package/store','PackageController@store')->name('package.store');
+    Route::get('/package/destroy/{id}','PackageController@destroy')->name('package.destroy');
+    Route::get('/package/edit/{id}','PackageController@edit')->name('package.edit');
+
 
 
     Route::post('/upload', 'UploadController@upload');

@@ -18,40 +18,27 @@
         </tr>
     </thead>
     <tbody>
-    @foreach($apple as $robot)
+    @foreach($apple as $data)
         <tr>
-            <td>{!! $robot->id !!}</td>
-            <td>{!! $robot->device_id !!}</td>
-            <td>{!! $robot->nickname !!}</td>
+            <td>{!! $data->id !!}</td>
+            <td>{!! $data->account !!}</td>
+            <td>todo</td>
             <td>
-                @if($robot->sex==0)
-                    未知
-                @endif
-                @if($robot->sex==1)
-                    男
-                @endif
-                @if($robot->sex==2)
-                    女
-                @endif
+              {!! $data->secret_key !!}
 
             </td>
-            <td>{!! $robot->wx_account !!}</td>
-            <td><img class='showimage' width="60" height="60" src="{!! $robot->img !!}"></td>
+            <td>{!! $data->p12_url !!}</td>
 
 
-            <td>{!! $robot->login_status == 0 ? '离线' : '在线' !!}</td>
+            <td>todo</td>
+            <td>{!! $data->created_at !!}</td>
             
             <td>
-                {!! Form::open(['route' => ['robots.destroy', $robot->id], 'method' => 'delete']) !!}
+                {!! Form::open(['route' => ['apple.destroy', $data->id], 'method' => 'get']) !!}
                 <div class='btn-group'>
-                    <a href="{!! route('robots.edit', [$robot->id]) !!}" class='btn btn-default btn-xs'>修改</a>
+                    <a href="{!! route('apple.edit', [$data->id]) !!}" class='btn btn-default btn-xs'>修改</a>
                     {!! Form::button('删除', ['type' => 'submit', 'class' => 'btn btn-danger btn-xs', 'onclick' => "return confirm('Are you sure?')"]) !!}
-                    @if($robot->run_status==1)
-                        <a style="color:green" href="/robot/updateRobot?id={{$robot->id}}&run_status=0" class='btn btn-default btn-xs'>停用</a>
-                    @endif
-                    @if($robot->run_status==0)
-                        <a style="color:green" href="/robot/updateRobot?id={{$robot->id}}&run_status=1" class='btn btn-default btn-xs'>启用</a>
-                    @endif
+                   
                 </div>
                 {!! Form::close() !!}
 

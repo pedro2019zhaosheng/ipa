@@ -6,28 +6,23 @@ use App\Http\Requests\CreateRobotRequest;
 use App\Http\Requests\UpdateRobotRequest;
 use App\Models\Robot;
 use App\Repositories\RobotRepository;
-use App\Repositories\FriendRepository;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use Flash;
 use Illuminate\Support\Facades\Auth;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
-use App\Models\Friend;
-use App\Models\FriendReply;
-use DB;
-use App\Models\FriendCircle;
+use App\Models\Package;
+use App\Models\Device;
+
 class PackageController extends AppBaseController
 {
     /** @var  robotRepository */
     private $robotRepository;
-    private $friendRepository;
 
-    public function __construct(RobotRepository $robotRepo, FriendRepository $friendRepo)
+    public function __construct(RobotRepository $robotRepo,Request $request)
     {
         $this->robotRepository = $robotRepo;
-        $this->friendRepository = $friendRepo;
-        $request = Request();
         $this->getCurrentAction($request);
     }
 
@@ -37,176 +32,208 @@ class PackageController extends AppBaseController
      * @param Request $request
      * @return Response
      */
-    public function saveCircle(Request $request)
+    public function package(Request $request)
+    {
+//        dump($request);die;
+        $where = [];
+        if(!empty($request->name)){
+            $where[] = ['name','like','%'.$request->name.'%'];
+        }
+        $robots = Package::where($where)->paginate(10);
+        $robots->appends(array(
+            'page' => $request->page,
+            'name' => $request->name,
+        ));
+        return view('package.index')
+            ->with('package', $robots);
+    }
+
+    /**
+     * Show the form for creating a new Game.
+     *
+     * @return Response
+     */
+    public function create()
+    {
+        //todo 二维码
+        $qrcode = "https://tvax4.sinaimg.cn/crop.0.0.1125.1125.180/49282834ly8fvi8ifbnz4j20v90v9tau.jpg?KID=imgbed,tva&Expires=1567774272&ssig=aGCljOl9Zz";
+        $qrcode= "http://47.91.251.232:8892/qr_image.png";
+        return view('package.create')->with('qrcode',$qrcode);
+    }
+
+    /**
+     * Store a newly created Game in storage.
+     *
+     * @param CreateGameRequest $request
+     *
+     * @return Response
+     */
+    public function store(CreateRobotRequest $request)
+    {
+
+      
+        $data = $request->all();
+        if(!isset($data['introduction'])){
+            Flash::error("简介不能为空");
+            return redirect(url('/package/create'));
+        }
+       
+        $filename = $this->uploadFile($request);
+        $input = $request->all();
+        if(!$filename){
+            $filename = $data['ipa_url'];
+        }
+        $package = [
+                'introduction'=>$data['introduction'],
+                'ipa_url'=>$filename,
+            ];
+        if($data['id']>0){
+            package::where(['id'=>$data['id']])->update($package);
+        }else{
+            Package::insert($package);
+        }
+       
+      
+        Flash::success('苹果IPA包创建成功');
+
+        return redirect(url('package/package'));
+    }
+
+    /**
+     * Display the specified Game.
+     *
+     * @param  int $id
+     *
+     * @return Response
+     */
+    public function show($id)
+    {
+        $game = $this->robotRepository->findWithoutFail($id);
+
+        if (empty($game)) {
+
+            return redirect(route('robots.index'));
+        }
+
+        return view('robots.show')->with('game', $game);
+    }
+
+    /**
+     * Show the form for editing the specified Game.
+     *
+     * @param  int $id
+     *
+     * @return Response
+     */
+    public function edit($id)
+    {
+        $package = Package::where(['id'=>$id])->first();
+
+        if (empty($package)) {
+            Flash::error('安装包未找到');
+
+            return redirect(route('package.index'));
+        }
+        return view('package.create')->with('package', $package);
+    }
+
+    /**
+     * Update the specified Game in storage.
+     *
+     * @param  int              $id
+     * @param UpdateGameRequest $request
+     *
+     * @return Response
+     */
+    public function update($id, UpdateRobotRequest $request)
+    {
+        $robot = $this->robotRepository->findWithoutFail($id);
+
+        if (empty($robot)) {
+            Flash::error('机器人没找到');
+
+            return redirect(route('robots.index'));
+        }
+
+        $robot = $this->robotRepository->update($request->all(), $id);
+
+        Flash::success('机器人更新成功');
+
+        return redirect(route('robots.index'));
+    }
+
+    /**
+     * Remove the specified Game from storage.
+     *
+     * @param  int $id
+     *
+     * @return Response
+     */
+    public function destroy($id)
+    {
+        $package = Package::where(['id'=>$id])->first();
+
+        if (empty($package)) {
+            Flash::error('Ipa包未找到');
+
+            return redirect(url('package/package'));
+        }
+
+        Package::where(['id'=>$id])->delete();
+
+        Flash::success('Package No deleted successfully.');
+
+        return redirect(url('package/package'));
+    }
+
+//    public function search(Request $request)
+//    {
+//        $page = $request->get('page');
+//        dump($page);die;
+//        $where = [];
+//        if(!empty($request->name)){
+//            $where[] = ['name','like','%'.$request->name.'%'];
+//        }
+//        if(!empty($request->type)){
+//            $where[] = ['type','=',$request->type];
+//        }
+//        $robots = $this->robotRepository->findAndPaginate($where);
+////        $this->robotRepository->paginate(1);
+//        dump($robots);die;
+////        $robots->appends(array(
+////            'search' => $search,
+////            'customer_type' => $customer_type,
+////            'perPage' => $perPage,
+////        ));
+//
+//        return view('robots.index')
+//            ->with('robots', $robots)->with('gameTypes',$this->gameTypes);
+//
+//    }
+
+    /**
+     * Remove the specified Game from storage.
+     *
+     * @param  int $id
+     *
+     * @return Response
+     */
+    public function updateRobot(Request $request)
     {
         $data = $request->all();
-        if(!isset($data['robot_id'])){
-            Flash::error("微信号不能为空！");
-            return redirect(url('/circle/circle'));
-        }
-        $type = $data['type']>0?$data['type']:1;
-        //当前登录用户信息
-        if (isset($data['type'])) {
-            foreach ($data['robot_id'] as $v) {
-                $where['type'] = 1;
-                $where['robot_id'] = $v;
-                $where['user_id'] =  $this->authUserInfo()->id;
-                $d['status'] = $data['status'];
-                $d['type'] = 1;
-                $d['user_id'] =  $this->authUserInfo()->id;
-                $d['robot_id'] = $v;
-                //获取朋友圈用户
-                $circle_url = env('CIRCLE_URL');
-                $res = @file_get_contents("$circle_url?area={$data['province']}&type={$data['type']}&sex=0");//todo
+        $game = $this->robotRepository->findWithoutFail($data['id']);
 
-                $user = [];
-                if ($res) {
-                    $ds = json_decode($res);
-                    $user = $ds->user_id;
-                }
-                $config = [ 'start' => $data['start'], 'end' => $data['end'], 'type' => $data['type'], 'sex' => $data['sex'],
-                    'interval' => $data['interval'], 'user' => $user,'site'=>$data['city'],'province'=>$data['province']];
-                $d['config'] = json_encode($config,JSON_UNESCAPED_UNICODE);
-                FriendCircle::updateOrInsert($where, $d);
-            }
+        if (empty($game)) {
+            Flash::error('机器人未找到');
+
+            return redirect(route('robots.index'));
         }
 
-        Flash::success('更新成功');
-        return redirect(url('/circle/circle'));
+        $this->robotRepository->update(['run_status'=>$data['run_status']],$data['id']);
+
+        Flash::success('update successfully.');
+
+        return redirect(route('robots.index'));
     }
-
-    /**
-     * Display a listing of the Game.
-     *
-     * @param Request $request
-     * @return Response
-     */
-    public function circle(Request $request){
-        $res = isset($_SESSION['robot_ids_6'])?$_SESSION['robot_ids_6']:[] ;
-        //通过微信获取微信群
-        $tg  = [];
-        if($res){
-            foreach($res as &$v){
-                $tg[$v] = $v;
-            }
-        }
-        $robot = Robot::where($this->condition())->pluck('nickname','id');
-        $id = 0;
-        if($res){
-            $id = current($res);
-        }
-        $wxData = FriendCircle::where('robot_id',$id)->where($this->condition())->first();
-        //获取朋友圈用户
-        $ds = [];
-        $circle_url = env('CIRCLE_URL');
-        $res = @file_get_contents("$circle_url?area=北京&type=1&sex=0");//todo
-        $ds = json_decode($res);
-        if($ds){
-            foreach($ds->data as &$vs){
-                $new = preg_replace("/<p.*?>|<\/p>/is","", $vs->content);
-                $vs->content = $new;
-            }
-        }else{
-            $ds = new \stdClass();
-            $ds->user_num = 0;
-            $ds->weibo_num = 0;
-            $ds->data = [];
-        }
-
-
-        if($wxData){
-//            $circle_url = env('CIRCLE_URL');
-//            $res = @file_get_contents('http://192.168.115.128:8802/api/weibousers/count?area=北京&type=' . $wxData->type);//todo
-//            $ds = json_decode($res);
-//            foreach($ds->data as &$vs){
-/*                $new = preg_replace("/<p.*?>|<\/p>/is","", $vs->content);*/
-//                $vs->content = $new;
-//            }
-            $wxData_arr = json_decode($wxData->config,true);
-            $wxData->interval = $wxData_arr['interval'];
-            $wxData->start = $wxData_arr['start'];
-            $wxData->end = $wxData_arr['end'];
-            $wxData->sex = $wxData_arr['sex'];
-            $wxData->type = $wxData_arr['type'];
-            $wxData->province = isset($wxData_arr['province'])?$wxData_arr['province']:'';
-            $wxData->city = isset($wxData_arr['site'])?$wxData_arr['site']:1;
-        }else{
-
-            $wxData = new \stdClass();
-            $wxData->start = 0;
-            $wxData->end = 0;
-            $wxData->msg = '';
-            $wxData->sex = 0;
-            $wxData->status = 0;
-            $wxData->type = 0;
-            $wxData->interval = 0;
-            $wxData->content = '';
-            $wxData->province = '';
-            $wxData->city = [];
-//            $ds = new \stdClass();
-//            $ds->user_num = 0;
-//            $ds->weibo_num = 0;
-//            $ds->data[0] = new \stdClass();
-//            $ds->data[0]->user_num = 0;
-//            $ds->data[0]->weibo_num = 0;
-//            $ds->data[0]->content = '';
-        }
-
-        $tmp = [];
-        if(isset($wxData->province)&&$wxData->province!=''){
-           //查询原省下面市的数据
-            $origin_province = DB::table('area')->where('name',$wxData->province)->orderBy('id','desc')->first();
-            $originCity =  DB::table('area')->where('parent_id',$origin_province->id)->get()->pluck('name','id')->toArray();
-            $originCity = array_values($originCity);
-            $tmp = [];
-            $array_intersect = array_intersect($originCity,$wxData->city);
-            foreach ($originCity as $k=> &$vs){
-                $stmp = [
-                    'name'=>$vs,
-                    'status'=>0,
-                ];
-                if(isset($array_intersect[$k])&&$vs==$array_intersect[$k]){
-                    $stmp = [
-                        'name'=>$vs,
-                        'status'=>1,
-                    ];
-                }
-                $tmp[] = $stmp;
-            }
-        }
-
-        //获取省
-        $province = DB::table('area')->where(['parent_id'=>1])->get();
-        $returnData = ['robot'=>$robot,'request'=>$request,'request_url'=>url()->current(),'select'=>$tg,'wxdata'=>$wxData,'ds'=>$ds,'province'=>$province
-            ,'originCity'=>$tmp
-        ];
-        return view('circle.circle')->with($returnData);
-    }
-
-    /**
-     * Display a listing of the Game.
-     *
-     * @param Request $request
-     * @return Response
-     */
-    public function getCity(Request $request){
-        $province_id = $request->province_id>0?$request->province_id:-99;
-        $special_province = ['110000','120000','310000','500000'];
-        if(in_array($province_id,$special_province)){
-            $next = DB::table('area')->where('parent_id',$province_id)->first();
-            $city = DB::table('area')->where('parent_id',$next->id)->get()->toArray();
-        }else{
-            $city = DB::table('area')->where('parent_id',$province_id)->get()->toArray();
-        }
-
-
-        $return =  [
-            'status'=>1,
-            'city'=>$city
-        ];
-        echo  json_encode($return);
-    }
-
-
 
 }

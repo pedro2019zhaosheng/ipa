@@ -3,35 +3,25 @@
 @section('content')
     <section class="content-header">
         <h1>
-            创建机器人
+            添加设备
         </h1>
     </section>
     <div class="content">
         @include('adminlte-templates::common.errors')
-        <div class="box box-primary">
-            <div class="box-body">
-                <div class="">
-                    <p>提示：请允许app插件获得所需权限才可同步微信信息并由机器人接管微信。</p>
-                </div>
-            </div>
-        </div>
-        <div class="box box-primary">
-            <div class="box-body">
-                <div class="">
-                    <p>消息提示区域：效果跟消息弹窗一个效果。</p>
-                </div>
-            </div>
-        </div>
+         @include('flash::message')
         <div class="box box-primary">
             <div class="box-body">
                 <div class="row">
-                    {!! Form::open(['route' => 'robots.store','files' => true]) !!}
+                    {!! Form::open(['route' => 'device.store','files' => true]) !!}
+                <input type='hidden' name='id' value="{{isset($device->id)?$device->id:0}}">
+                <input type='hidden' name='p12_url' value="{{isset($device->p12_url)?$device->p12_url:''}}">  
 {{--                    @include('robots.fields')--}}
                         <div class="form-group col-sm-12">
-                            {!! Form::label('device_id', '1、输入app里面的设备ID:') !!}
-                            {!! Form::text('device_id', null, ['class' => 'form-control']) !!}
+                            {!! Form::label('account', '设备UDID:') !!}
+                            {!! Form::text('udid', isset($device->udid)?$device->udid:'' , ['class' => 'form-control']) !!}
                         </div>
                 </div>
+                
             </div>
 
         </div>
@@ -39,11 +29,7 @@
             <div class="box-body">
                 <div class="">
 
-                    <p>
-                        2、安卓手机扫码安装app插件，并允许所有权限。</p>
-                    <img class='showimage' width="120" height="120" src="{!! $qrcode !!}">
-                    </br>
-                    </br>
+                  
                     <!-- Submit Field -->
                     <div class="form-group">
                         {!! Form::submit('保存', ['class' => 'btn btn-primary']) !!}

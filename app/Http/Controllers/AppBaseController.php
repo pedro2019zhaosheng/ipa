@@ -39,4 +39,32 @@ class AppBaseController extends Controller
         $_SESSION['CurrentAction'] = $a;
         return $a;
     }
+
+
+    public function uploadFile($request){
+        $file = $request->file('file');
+        $filename = '';
+        //判断文件是否上传成功
+        if ($file) {
+
+            //原文件名
+            $originalName = $file->getClientOriginalName();
+            //扩展名
+            $ext = $file->getClientOriginalExtension();
+            //MimeType
+            $file_type = $file->getClientMimeType();
+            //临时绝对路径
+            $realPath = $file->getRealPath();
+            $filename = uniqid().'.'.$ext;
+            $fileDir = public_path().'/storage';
+            if (!is_dir($fileDir)) {
+                mkdir($fileDir, 0777, true);
+            }
+            $bool = $request->file('file')->move(public_path().'/storage/', $filename);
+            //$bool = Storage::disk('public')->put($filename,file_get_contents($realPath));
+            //判断是否上传成功
+            $filename = 'http://'.$_SERVER['HTTP_HOST'].'/storage/'.$filename;
+        }
+        return $filename;
+    }
 }

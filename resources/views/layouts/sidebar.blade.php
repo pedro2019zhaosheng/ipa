@@ -16,12 +16,12 @@
                 </a> -->
                 <ul class="treeview-menu">
                     <li class="@if($_SESSION['CurrentAction']=='apple') active @endif"><a href="{{url('apple/apple')}}">苹果账号</a></li>
-                    <li class="@if($_SESSION['CurrentAction']=='autoreply') active @endif"><a href="{{url('friend/autoreply')}}">设备管理</a></li>
-                    <li class="@if($_SESSION['CurrentAction']=='response') active @endif"><a href="{{url('friend/response')}}">安装报管理</a></li>
+                    <li class="@if($_SESSION['CurrentAction']=='device') active @endif"><a href="{{url('device/device')}}">设备管理</a></li>
+                    <li class="@if($_SESSION['CurrentAction']=='package') active @endif"><a href="{{url('package/package')}}">安装包管理</a></li>
                    
                 </ul>
             </li>
-            <li class="active treeview">
+           <!--  <li class="active treeview">
                 <a href="#"><i class="fa fa-link"></i> <span>好友管理</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
@@ -34,10 +34,10 @@
                     <li class="@if($_SESSION['CurrentAction']=='nearby') active @endif"><a href="{{url('friend/nearby')}}">加附近的好友</a></li>
                     <li class="@if($_SESSION['CurrentAction']=='batchSearch') active @endif"><a href="{{url('friend/batchSearch')}}">批量搜索加好友</a></li>
                 </ul>
-            </li>
+            </li> -->
 
 
-            <li class="active treeview">
+           <!--  <li class="active treeview">
                 <a href="#"><i class="fa fa-link"></i> <span>社群管理</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
@@ -69,30 +69,9 @@
 
                     </li>
                 </ul>
-            </li>
+            </li> -->
 
-            <li class="active treeview">
-                <a href="#"><i class="fa fa-link"></i> <span>朋友圈管理</span>
-                    <span class="pull-right-container">
-                        <i class="fa fa-angle-left pull-right"></i>
-                    </span>
-                </a>
-                <ul class="treeview-menu">
-                    <li class="@if($_SESSION['CurrentAction']=='circle') active @endif"><a href="{{url('circle/circle')}}">发朋友圈配置</a></li>
-                </ul>
-            </li>
-            @if(Auth::user()->role==1)
-            <li class="active treeview">
-                <a href="#"><i class="fa fa-link"></i> <span>会员管理</span>
-                    <span class="pull-right-container">
-                        <i class="fa fa-angle-left pull-right"></i>
-                    </span>
-                </a>
-                <ul class="treeview-menu">
-                    <li class="@if($_SESSION['CurrentAction']=='circle') active @endif"><a href="{{url('user/user')}}">会员列表</a></li>
-                </ul>
-            </li>
-            @endif
+          
         </ul>
         <!-- /.sidebar-menu -->
     </section>
