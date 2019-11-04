@@ -26,3 +26,6 @@ Route::post('mlogin', 'Api\ApiController@mlogin');
 Route::post('tlogin', 'Api\ApiController@tlogin');
 Route::post('logout', 'Api\ApiController@logout');
 Route::post('getArea', 'Api\ApiController@getArea');
+
+
+Route::post('apple/generatePackage','Api\AppleController@generatePackage')->name('generatePackage');
