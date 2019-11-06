@@ -17,8 +17,9 @@
             <div class="box-body">
                 {!! Form::open(['url' => 'package/package','method'=>'GET']) !!}
                 <div class="form-group col-sm-100">
-                    {!! Form::label('name', '包名:') !!}
-                    <span style="color: red">下载地址规则参数:http://49.235.90.84:8893/api/apple/generatePackage?package_id=安装包Id&$apple_id=苹果账号ID</span>
+                    {!! Form::label('name', 'app下载地址:') !!}</br>
+                    <span style="color: red">下载地址规则参数:http://49.235.90.84:8893/api/apple/generatePackage?package_id=安装包Id&$apple_id=苹果账号ID</span></br>
+                    <span style="color: red">示例:http://test.daoyuancloud.com/udid?apple_id=3&package_id=2</span>
                 </div>
 
 

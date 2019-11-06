@@ -28,17 +28,19 @@ class AppleController extends Controller
              return json_encode(['status'=>0,'message'=>'缺少参数！','data'=>[]]);
         }
 
-        $deviceInfo = Device::where(['udid'=>$udid])->first();
+        $deviceInfo = Device::where(['udid'=>$udid,'package_id'=>$request['package_id']])->first();
         if($deviceInfo){
             $url = 'itms-services://?action=download-manifest&amp;url='.$deviceInfo->plist_url;//todo
             // $url = "itms-services://?action=download-manifest&amp;url=https://test.daoyuancloud.com/install_ipa/9efa99314d8da5632a37dfa2abad6ac5cedb715e_20191030142348.plist";
             header("Location: $url");
+            exit(0);
         }
         //获取包信息
         $package = Package::where(['id'=>$request->package_id])->first();
         if($package){
             $ipa_arr = explode('/', $package->ipa_url);
             $ipa_url = "/usr/local/homeroot/ipa/public/storage/".end($ipa_arr);
+            $buddle_id = $package->buddle_id;
         }
         //第一步根据苹果账号ID获取个人开发者账号信息
         $appleDeveloperInfo = DB::table('apple')->where(['id'=>$request->apple_id])->first();
@@ -60,24 +62,27 @@ class AppleController extends Controller
     	// echo $out[0];
     	//第二步生成证书
     	$stepTwoCmd = "$cmdRoot sudo  /bin/ruby saveCert.rb $account $secret $certificate_id $p12_url";
+
     	exec($stepTwoCmd,$outTwo);
     	if(isset($outTwo[1])){
-    		$clientKey = "/applesign/rpaz23@163.com/CYL58XBX6H/client_key.pem";
-    		$privateKey = "/applesign/rpaz23@163.com/CYL58XBX6H/private_key.pem";
+    		$clientKey = "/applesign/$account/$certificate_id/client_key.pem";
+    		$privateKey = "/applesign/$account/$certificate_id/private_key.pem";
     	}
     	//第三步将udid写入开发者账号
-    	$stepThreeCmd = "$cmdRoot sudo  /bin/ruby addUUid.rb $account $secret  $udid com.siyan.secretalbum $certificate_id";
+    	$stepThreeCmd = "$cmdRoot sudo  /bin/ruby addUUid.rb $account $secret  $udid $buddle_id $certificate_id";
+
     	exec($stepThreeCmd,$outThree);
     	if(isset($outThree[0])){
-    		$mobileprovision  = "/applesign/rpaz23@163.com/CYL58XBX6H/sign.com.siyan.secretalbum.mobileprovision";
+    		$mobileprovision  = "/applesign/$account/$certificate_id/sign.$buddle_id.mobileprovision";
     	}
     	//第四步生成ipa包
-    	$stepFourCmd = "$cmdRoot sudo /bin/ruby signIpa.rb $account  $udid  $ipa_url com.siyan.secretalbum CYL58XBX6H /applesign/rpaz23@163.com/CYL58XBX6H/sign.com.siyan.secretalbum.mobileprovision /applesign/rpaz23@163.com/CYL58XBX6H/client_key.pem /applesign/rpaz23@163.com/CYL58XBX6H/private_key.pem";
+    	$stepFourCmd = "$cmdRoot sudo /bin/ruby signIpa.rb $account  $udid  $ipa_url $buddle_id $certificate_id /applesign/$account/$certificate_id/sign.$buddle_id.mobileprovision /applesign/$account/$certificate_id/client_key.pem /applesign/$account/$certificate_id/private_key.pem";
     	exec($stepFourCmd,$outFour);
     	if(isset($outFour[0])){
     		$ipa = $outFour[0];
     		$plist = $outFour[1];
     	}
+        // print_r($stepFourCmd);die;
         //ipa入库
         // $mvFrom = $ipa;
         // $filename = $request->apple_id.'-'.$udid.'.ipa';
@@ -100,15 +105,16 @@ class AppleController extends Controller
             // $plistUrl = 'https://'.$_SERVER['HTTP_HOST'].'/storage/'.$plistName;//todo
             // $plistUrl = "https://test.daoyuancloud.com/install_ipa/".$plistName;
             $download_url = "https://test.daoyuancloud.com".$ipa;
-             $plistUrl = "https://test.daoyuancloud.com".$plist;
+            $plistUrl = "https://test.daoyuancloud.com".$plist;
             $data = [
                 'apple_id'=>$request->apple_id,
-                'package_id'=>2,//todo
+                'package_id'=>$request->package_id,//todo
                 'udid'=>$udid,
                 'ipa_url'=>$download_url,
                 'plist_url'=>$plistUrl,
                 'created_at'=>date('Y-m-d H:i:s')
             ];
+
             Device::insert($data);
         }
         $url = "itms-services://?action=download-manifest&amp;url=$plistUrl";
