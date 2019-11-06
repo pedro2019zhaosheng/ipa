@@ -39,6 +39,15 @@
                             {!! Form::file('file') !!}
                         </div>
                 </div>
+
+                 <div class="row">
+                    {!! Form::open(['route' => 'robots.store','files' => true]) !!}
+{{--                    @include('robots.fields')--}}
+                        <div class="form-group col-sm-12">
+                            {!! Form::label('secret_key', '证书ID:') !!}
+                            {!! Form::text('certificate_id', isset($apple->certificate_id)?$apple->certificate_id:'', ['class' => 'form-control']) !!}
+                        </div>
+                </div>
                 
             </div>
 
@@ -51,7 +60,7 @@
                     <!-- Submit Field -->
                     <div class="form-group">
                         {!! Form::submit('保存', ['class' => 'btn btn-primary']) !!}
-                        <a href="{!! route('robots.index') !!}" class="btn btn-default">取消</a>
+                        <a href="{!! url('apple/apple') !!}" class="btn btn-default">取消</a>
                     </div>
                     {!! Form::close() !!}
                 </div>

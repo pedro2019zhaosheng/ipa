@@ -90,8 +90,11 @@ class AppleController extends AppBaseController
                 'account'=>$data['account'],
                 'secret_key'=>$data['secret_key'],
                 'p12_url'=>$filename,
+                'certificate_id'=>$request->certificate_id,
+                'created_at'=>date('Y-m-d H:i:s')
             ];
         if($data['id']>0){
+            unset($apple['created_at']);
             Apple::where(['id'=>$data['id']])->update($apple);
         }else{
             Apple::insert($apple);

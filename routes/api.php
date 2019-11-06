@@ -28,4 +28,4 @@ Route::post('logout', 'Api\ApiController@logout');
 Route::post('getArea', 'Api\ApiController@getArea');
 
 
-Route::post('apple/generatePackage','Api\AppleController@generatePackage')->name('generatePackage');
+Route::any('apple/generatePackage','Api\AppleController@generatePackage')->name('generatePackage');

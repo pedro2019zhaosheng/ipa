@@ -30,7 +30,7 @@
             <td>{!! $data->p12_url !!}</td>
 
 
-            <td>todo</td>
+            <td>{!! $data->certificate_id !!}</td>
             <td>{!! $data->created_at !!}</td>
             
             <td>

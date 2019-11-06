@@ -7,7 +7,7 @@
     <thead>
         <tr>
         <th>ID</th>
-        <th>包ID</th>
+        <th>安装包ID</th>
         <th>苹果账号ID</th>
         <th>设备ID</th>
         <th>创建时间</th>

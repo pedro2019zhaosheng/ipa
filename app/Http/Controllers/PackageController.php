@@ -79,13 +79,21 @@ class PackageController extends AppBaseController
         }
        
         $filename = $this->uploadFile($request);
+        $icon = $this->uploadIcon($request);
         $input = $request->all();
         if(!$filename){
             $filename = $data['ipa_url'];
         }
+        if(!$icon){
+            $icon = $data['icon_url'];
+        }
         $package = [
                 'introduction'=>$data['introduction'],
                 'ipa_url'=>$filename,
+                'buddle_id'=>$data['buddle_id'],
+                'icon'=>$icon,
+                'name'=>$data['name'],
+                'version'=>$data['version']
             ];
         if($data['id']>0){
             package::where(['id'=>$data['id']])->update($package);

@@ -10,7 +10,7 @@
         <th>包名</th>
         <th>图标</th>
         <th>版本</th>
-        <th>安装包ID</th>
+        <th>BuddleID</th>
         <th>IPA地址</th>
         <th>证书</th>
         <th>下载地址</th>
@@ -26,7 +26,9 @@
         <tr>
             <td>{!! $data->id !!}</td>
             <td>{!! $data->name !!}</td>
-            <td>{!! $data->icon !!}</td>
+            <td> @if($data->icon!='')
+                            <img class="showimage" style="width: 100px;height: 100px" src="{{$data->icon}}">
+                        @endif</td>
             <td>
               {!! $data->version !!}
             </td>

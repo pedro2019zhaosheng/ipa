@@ -4,3 +4,4 @@ logs
 /vendor
 /.idea
 .env
+/public/storage

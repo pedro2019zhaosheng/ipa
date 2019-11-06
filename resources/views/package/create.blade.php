@@ -12,21 +12,43 @@
         <div class="box box-primary">
             <div class="box-body">
                  <div class="row">
+                        
                     {!! Form::open(['route' => 'package.store','files' => true]) !!}
 {{--                    @include('robots.fields')--}}
+                        <div class="form-group col-sm-12">
+                            {!! Form::label('name', '包名:') !!}
+                            {!! Form::text('name', isset($package->name)?$package->name:'' , ['class' => 'form-control']) !!}
+                        </div>
+                        <div class="form-group col-sm-12">
+                            {!! Form::label('version', '版本:') !!}
+                            {!! Form::text('version', isset($package->version)?$package->version:'' , ['class' => 'form-control']) !!}
+                        </div>
+                        @if($package->icon!='')
+                            <img  style="width: 200px;" src="{{$package->icon}}">
+                        @endif
+                         <div class="form-group col-sm-12">
+                            {!! Form::label('device_id', 'Icon:') !!}
+                            {!! Form::file('icon') !!}
+                        </div>
 
                         <div class="form-group col-sm-12">
                             {!! Form::label('device_id', 'IPA文件:') !!}
                             {!! Form::file('file') !!}
                         </div>
                 </div>
+                
 
 
                 <div class="row">
                     {!! Form::open(['route' => 'package.store','files' => true]) !!}
                 <input type='hidden' name='id' value="{{isset($package->id)?$package->id:0}}">
                 <input type='hidden' name='ipa_url' value="{{isset($package->ipa_url)?$package->ipa_url:''}}">  
+                <input type='hidden' name='icon_url' value="{{isset($package->icon)?$package->icon:''}}">  
 {{--                    @include('robots.fields')--}}
+                         <div class="form-group col-sm-12">
+                            {!! Form::label('account', 'BuddleId:') !!}
+                            {!! Form::text('buddle_id', isset($package->buddle_id)?$package->buddle_id:'' , ['class' => 'form-control']) !!}
+                        </div>
                         <div class="form-group col-sm-12">
                             {!! Form::label('account', '简介:') !!}
                             {!! Form::text('introduction', isset($package->introduction)?$package->introduction:'' , ['class' => 'form-control']) !!}
@@ -46,7 +68,7 @@
                     <!-- Submit Field -->
                     <div class="form-group">
                         {!! Form::submit('保存', ['class' => 'btn btn-primary']) !!}
-                        <a href="{!! route('robots.index') !!}" class="btn btn-default">取消</a>
+                        <a href="{!! url('package/package') !!}" class="btn btn-default">取消</a>
                     </div>
                     {!! Form::close() !!}
                 </div>
