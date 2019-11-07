@@ -22,7 +22,7 @@
         <tr>
             <td>{!! $data->id !!}</td>
             <td>{!! $data->account !!}</td>
-            <td>todo</td>
+            <td>{!! $data->udid_num !!}</td>
             <td>
               {!! $data->secret_key !!}
 
