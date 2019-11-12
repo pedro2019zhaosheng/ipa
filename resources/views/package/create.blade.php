@@ -23,7 +23,7 @@
                             {!! Form::label('version', '版本:') !!}
                             {!! Form::text('version', isset($package->version)?$package->version:'' , ['class' => 'form-control']) !!}
                         </div>
-                        @if($package->icon!='')
+                        @if(isset($packge->icon)&&$package->icon!='')
                             <img  style="width: 200px;" src="{{$package->icon}}">
                         @endif
                          <div class="form-group col-sm-12">

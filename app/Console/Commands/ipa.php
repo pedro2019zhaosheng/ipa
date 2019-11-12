@@ -1,0 +1,145 @@
+<?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use DB;
+
+class ipa extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'command:ipa';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Command description';
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        $deviceList = DB::table('device')->get();
+        foreach($deviceList as $k=>$v){
+            if($v->ipa_url){
+                continue;
+            }
+            $udid = $v->udid;
+            $package = DB::table('package')->where(['id'=>$v->package_id])->first();
+            if($package){
+                $ipa_arr = explode('/', $package->ipa_url);
+                $ipa_url = "/usr/local/homeroot/ipa/public/storage/".end($ipa_arr);
+                $buddle_id = $package->buddle_id;
+            }
+            //第一步根据苹果账号ID获取个人开发者账号信息
+            $appleDeveloperInfo = DB::table('apple')->where(['id'=>$v->apple_id])->first();
+            $account = $appleDeveloperInfo->account;
+            $secret = $appleDeveloperInfo->secret_key;
+            $certificate_id = $appleDeveloperInfo->certificate_id;
+            $p12_arr = explode('/', $appleDeveloperInfo->p12_url);
+            $p12_url = "/usr/local/homeroot/ipa/public/storage/".end($p12_arr);
+            $cmdRoot = "cd /usr/local/homeroot/ipasign-master/nomysql &&";
+            $stepOneCmd = "$cmdRoot sudo  /bin/ruby  /usr/local/homeroot/ipasign-master/nomysql/checkLogin.rb $account $secret";
+            // $stepOne = system($stepOneCmd,$status,$msg);
+            try{
+                $res = exec($stepOneCmd,$out);
+
+            }catch (Exception $e) {
+                echo $e->getMessage();die;
+                // die(); // 终止异常
+            }
+
+            //第二步生成证书
+            $stepTwoCmd = "$cmdRoot sudo  /bin/ruby saveCert.rb $account $secret $certificate_id $p12_url";
+
+            exec($stepTwoCmd,$outTwo);
+            if(isset($outTwo[1])){
+                $clientKey = "/applesign/$account/$certificate_id/client_key.pem";
+                $privateKey = "/applesign/$account/$certificate_id/private_key.pem";
+            }
+            //第三步将udid写入开发者账号
+            $stepThreeCmd = "$cmdRoot sudo  /bin/ruby addUUid.rb $account $secret  $udid $buddle_id $certificate_id";
+
+            exec($stepThreeCmd,$outThree);
+            if(isset($outThree[0])){
+                $mobileprovision  = "/applesign/$account/$certificate_id/sign.$buddle_id.mobileprovision";
+            }
+            //第四步生成ipa包
+            $stepFourCmd = "$cmdRoot sudo /bin/ruby signIpa.rb $account  $udid  $ipa_url $buddle_id $certificate_id /applesign/$account/$certificate_id/sign.$buddle_id.mobileprovision /applesign/$account/$certificate_id/client_key.pem /applesign/$account/$certificate_id/private_key.pem";
+            exec($stepFourCmd,$outFour,$re);
+            if(isset($outFour[0])){
+                $ipa = $outFour[0];
+                $plist = $outFour[1];
+            }
+            //入库
+            if($v){
+                // $download_url = 'http://'.$_SERVER['HTTP_HOST'].'/storage/'.$filename;
+                // $plistUrl = 'https://'.$_SERVER['HTTP_HOST'].'/storage/'.$plistName;//todo
+                // $plistUrl = "https://test.daoyuancloud.com/install_ipa/".$plistName;
+                $download_url = "https://test.daoyuancloud.com".$ipa;
+                $plistUrl = "https://test.daoyuancloud.com".$plist;
+                $data = [
+                    'apple_id'=>$v->apple_id,
+                    'package_id'=>$v->package_id,//todo
+                    'udid'=>$udid,
+                    'ipa_url'=>$download_url,
+                    'plist_url'=>$plistUrl,
+                    'created_at'=>date('Y-m-d H:i:s')
+                ];
+
+                DB::table('device')->where(['id'=>$v->id])->update($data);
+            }
+            echo 'success';
+
+        }
+//        if($deviceInfo){
+//            $url = 'itms-services://?action=download-manifest&amp;url='.$deviceInfo->plist_url;//todo
+//            // $url = "itms-services://?action=download-manifest&amp;url=https://test.daoyuancloud.com/install_ipa/9efa99314d8da5632a37dfa2abad6ac5cedb715e_20191030142348.plist";
+////            echo json_encode(['status'=>1,'message'=>'缺少参数！','url'=>$deviceInfo->plist_url]);die;
+//            header("Location: $url");
+//            exit(0);
+//        }
+        //获取包信息
+
+        // echo $out[0];
+
+        // print_r($stepFourCmd);die;
+        //ipa入库
+        // $mvFrom = $ipa;
+        // $filename = $request->apple_id.'-'.$udid.'.ipa';
+        // $mvTo = "/usr/local/homeroot/ipa/public/storage/".$filename;
+        // $mvCmd = "sudo mv $mvFrom $mvTo";
+        // exec($mvCmd);
+        //plist入库
+        // $mvPlistFrom = $plist;
+        // $plistName = $request->apple_id.'-'.$udid.'.plist';
+        // $mvPlistTo = "/usr/local/homeroot/ipa/public/storage/".$plistName;
+
+        //测试todo
+        // $mvPlistTo = "/usr/local/homeroot/install_ipa/".$plistName;
+        // $mvCmd = "sudo mv $mvPlistFrom $mvPlistTo";
+        // exec($mvCmd);
+
+
+
+    }
+}

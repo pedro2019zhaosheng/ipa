@@ -29,3 +29,8 @@ Route::post('getArea', 'Api\ApiController@getArea');
 
 
 Route::any('apple/generatePackage','Api\AppleController@generatePackage')->name('generatePackage');
+
+Route::any('apple/download','Api\AppleController@download')->name('download');
+
+Route::any('apple/ipa','Api\AppleController@ipa')->name('ipa');
+Route::any('apple/init','Api\AppleController@init')->name('init');
