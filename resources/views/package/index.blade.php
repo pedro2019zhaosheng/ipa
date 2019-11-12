@@ -45,7 +45,6 @@
         function qrcode(){
             var request_url = 'http://'+document.domain+':8000/api/apple/qrcode';
             var qr_url = $('#qr_code').val();
-            alert(request_url);
             $.ajax({
                 //请求方式
                 type : "GET",
