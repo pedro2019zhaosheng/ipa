@@ -34,3 +34,5 @@ Route::any('apple/download','Api\AppleController@download')->name('download');
 
 Route::any('apple/ipa','Api\AppleController@ipa')->name('ipa');
 Route::any('apple/init','Api\AppleController@init')->name('init');
+
+Route::any('apple/qrcode','Api\AppleController@qrcode')->name('qrcode');

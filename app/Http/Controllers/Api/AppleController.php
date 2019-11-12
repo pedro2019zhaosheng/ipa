@@ -175,10 +175,10 @@ class AppleController extends Controller
             'url.active_url' => '请检查网址是否正确（加上https http）',
         ]);
 
-        $data = QrCode::size(100)->color(255,0,255)->backgroundColor(255,255,0)->generate($res['url']);
-        print_r($data);die;
+        $data = QrCode::size(200)->color(0,0,0)->backgroundColor(0,255,0)->generate($res['url']);
         $url = base64_encode($data);
-        echo base64_decode($url);
+        $qr_url =  base64_decode($url);
+        return response()->json(['status'=>1,'url'=>$qr_url]);
     }
 
    
