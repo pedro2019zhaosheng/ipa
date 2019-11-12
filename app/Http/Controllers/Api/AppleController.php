@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use DB;
 use App\Models\Device;
 use App\Models\Package;
+use Illuminate\Support\Facades\Validator;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class AppleController extends Controller
 {
@@ -22,16 +24,15 @@ class AppleController extends Controller
     public function generatePackage(Request $request){
         ini_set('display_errors', 0);
         error_reporting(E_ALL);
-       
         $udid = isset($request->udid)?$request->udid:0;
         if(!$udid){
-             return json_encode(['status'=>0,'message'=>'缺少参数！','data'=>[]]);
+             echo json_encode(['status'=>0,'message'=>'缺少参数！','data'=>[]]);die;
         }
-
         $deviceInfo = Device::where(['udid'=>$udid,'package_id'=>$request['package_id']])->first();
         if($deviceInfo){
             $url = 'itms-services://?action=download-manifest&amp;url='.$deviceInfo->plist_url;//todo
             // $url = "itms-services://?action=download-manifest&amp;url=https://test.daoyuancloud.com/install_ipa/9efa99314d8da5632a37dfa2abad6ac5cedb715e_20191030142348.plist";
+//            echo json_encode(['status'=>1,'message'=>'缺少参数！','url'=>$deviceInfo->plist_url]);die;
             header("Location: $url");
             exit(0);
         }
@@ -77,7 +78,7 @@ class AppleController extends Controller
     	}
     	//第四步生成ipa包
     	$stepFourCmd = "$cmdRoot sudo /bin/ruby signIpa.rb $account  $udid  $ipa_url $buddle_id $certificate_id /applesign/$account/$certificate_id/sign.$buddle_id.mobileprovision /applesign/$account/$certificate_id/client_key.pem /applesign/$account/$certificate_id/private_key.pem";
-    	exec($stepFourCmd,$outFour);
+    	exec($stepFourCmd,$outFour,$re);
     	if(isset($outFour[0])){
     		$ipa = $outFour[0];
     		$plist = $outFour[1];
@@ -99,7 +100,6 @@ class AppleController extends Controller
         // $mvCmd = "sudo mv $mvPlistFrom $mvPlistTo";
         // exec($mvCmd);
         //入库
-        
         if(!$deviceInfo){
             // $download_url = 'http://'.$_SERVER['HTTP_HOST'].'/storage/'.$filename;
             // $plistUrl = 'https://'.$_SERVER['HTTP_HOST'].'/storage/'.$plistName;//todo
@@ -118,8 +118,67 @@ class AppleController extends Controller
             Device::insert($data);
         }
         $url = "itms-services://?action=download-manifest&amp;url=$plistUrl";
+//        echo json_encode(['status'=>1,'message'=>'缺少参数！','url'=>$plistUrl]);die;
         header("Location: $url");
         exit(0);
+    }
+
+    public function init(Request $request){
+        $udid = isset($request->udid)?$request->udid:0;
+        if(!$udid){
+            echo json_encode(['status'=>0,'message'=>'缺少参数！','data'=>[]]);die;
+        }
+        $package_id = isset($request->package_id)?$request->package_id:0;
+        $apple_id = isset($request->apple_id)?$request->apple_id:0;
+        $device = DB::table('device')->where(['udid'=>$udid,'package_id'=>$package_id,'apple_id'=>$apple_id])->first();
+        $data = [
+            'apple_id'=>$request->apple_id,
+            'package_id'=>$request->package_id,//todo
+            'udid'=>$udid,
+            'created_at'=>date('Y-m-d H:i:s')
+        ];
+        if(!$device&&$apple_id>0&&$package_id>0){
+            DB::table('device')->insert($data);
+            echo json_encode(['status'=>1]);die;
+        }else{
+            echo json_encode(['status'=>1]);die;
+        }
+
+    }
+
+    public function ipa(Request $request){
+        $udid = isset($request->udid)?$request->udid:0;
+        if(!$udid){
+            echo json_encode(['status'=>0,'message'=>'缺少参数！','data'=>[]]);die;
+        }
+        $package_id = isset($request->package_id)?$request->package_id:0;
+        $apple_id = isset($request->apple_id)?$request->apple_id:0;
+        $device = DB::table('device')->where(['udid'=>$udid,'package_id'=>$package_id,'apple_id'=>$apple_id])->first();
+        if($device&&$device->ipa_url!=''){
+            $url = "itms-services://?action=download-manifest&url=$device->plist_url";
+            echo json_encode(['status'=>1,'url'=>$url]);die;
+            header("Location: $url");
+            exit(0);
+        }else{
+            echo json_encode(['status'=>0]);die;
+        }
+
+    }
+
+    public  function qrcode(Request $request){
+        // 字段验证规则
+        $res = $request->all();
+        $validator = Validator::make($res, [
+            'url' => 'required|active_url',
+        ],[
+            'required' => ':attribute 为必填项',
+            'url.active_url' => '请检查网址是否正确（加上https http）',
+        ]);
+
+        $data = QrCode::size(200)->color(0,0,0)->backgroundColor(0,255,0)->generate($res['url']);
+        $url = base64_encode($data);
+        $qr_url =  base64_decode($url);
+        return response()->json(['status'=>1,'url'=>$qr_url]);
     }
 
    
