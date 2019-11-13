@@ -91,12 +91,13 @@ class ipa extends Command
                 $plist = $outFour[1];
             }
             //入库
+            $scheme_url = env('SCHEME_URL');
             if($v){
                 // $download_url = 'http://'.$_SERVER['HTTP_HOST'].'/storage/'.$filename;
                 // $plistUrl = 'https://'.$_SERVER['HTTP_HOST'].'/storage/'.$plistName;//todo
                 // $plistUrl = "https://test.daoyuancloud.com/install_ipa/".$plistName;
-                $download_url = "https://test.daoyuancloud.com".$ipa;
-                $plistUrl = "https://test.daoyuancloud.com".$plist;
+                $download_url = $scheme_url.$ipa;
+                $plistUrl = $scheme_url.$plist;
                 $data = [
                     'apple_id'=>$v->apple_id,
                     'package_id'=>$v->package_id,//todo
