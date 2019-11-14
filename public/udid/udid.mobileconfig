@@ -5,7 +5,7 @@
         <key>PayloadContent</key>
         <dict>
             <key>URL</key>
-            <string>https://test.daoyuancloud.com/udid/receive.php</string>
+            <string>https://www.677677.com/udid/receive.php</string>
             <key>DeviceAttributes</key>
             <array>
                 <string>UDID</string>
@@ -16,7 +16,7 @@
             </array>
         </dict>
         <key>PayloadOrganization</key>
-        <string>test.daoyuancloud.com</string>
+        <string>677677.com</string>
         <key>PayloadDisplayName</key>
         <string>查询设备UDID</string>
         <key>PayloadVersion</key>
