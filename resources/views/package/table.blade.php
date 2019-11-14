@@ -10,7 +10,7 @@
         <th>包名</th>
         <th>图标</th>
         <th>版本</th>
-        <th>BuddleID</th>
+        {{--<th>BuddleID</th>--}}
         <th>IPA地址</th>
         <th>证书</th>
         <th>下载地址</th>
@@ -32,7 +32,7 @@
             <td>
               {!! $data->version !!}
             </td>
-             <td>{!! $data->buddle_id !!}</td>
+             {{--<td>{!! $data->buddle_id !!}</td>--}}
             <td>{!! $data->ipa_url !!}</td>
             <td>{!! $data->certificate_url !!}</td>
             <td>

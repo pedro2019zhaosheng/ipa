@@ -45,10 +45,10 @@
                 <input type='hidden' name='ipa_url' value="{{isset($package->ipa_url)?$package->ipa_url:''}}">  
                 <input type='hidden' name='icon_url' value="{{isset($package->icon)?$package->icon:''}}">  
 {{--                    @include('robots.fields')--}}
-                         <div class="form-group col-sm-12">
-                            {!! Form::label('account', 'BuddleId:') !!}
-                            {!! Form::text('buddle_id', isset($package->buddle_id)?$package->buddle_id:'' , ['class' => 'form-control']) !!}
-                        </div>
+                         {{--<div class="form-group col-sm-12">--}}
+                            {{--{!! Form::label('account', 'BuddleId:') !!}--}}
+                            {{--{!! Form::text('buddle_id', isset($package->buddle_id)?$package->buddle_id:'' , ['class' => 'form-control']) !!}--}}
+                        {{--</div>--}}
                         <div class="form-group col-sm-12">
                             {!! Form::label('account', '简介:') !!}
                             {!! Form::text('introduction', isset($package->introduction)?$package->introduction:'' , ['class' => 'form-control']) !!}

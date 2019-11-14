@@ -90,6 +90,7 @@ class AppleController extends AppBaseController
                 'account'=>$data['account'],
                 'secret_key'=>$data['secret_key'],
                 'p12_url'=>$filename,
+                'buddle_id'=>$request->buddle_id,
                 'certificate_id'=>$request->certificate_id,
                 'created_at'=>date('Y-m-d H:i:s')
             ];

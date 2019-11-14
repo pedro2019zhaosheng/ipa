@@ -52,6 +52,7 @@ class ipa extends Command
             }
             //第一步根据苹果账号ID获取个人开发者账号信息
             $appleDeveloperInfo = DB::table('apple')->where(['id'=>$v->apple_id])->first();
+            //处理apple账号数量超过99
             $account = $appleDeveloperInfo->account;
             $secret = $appleDeveloperInfo->secret_key;
             $certificate_id = $appleDeveloperInfo->certificate_id;
