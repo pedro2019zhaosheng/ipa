@@ -83,7 +83,6 @@ class AppleController extends Controller
     		$ipa = $outFour[0];
     		$plist = $outFour[1];
     	}
-        // print_r($stepFourCmd);die;
         //ipa入库
         // $mvFrom = $ipa;
         // $filename = $request->apple_id.'-'.$udid.'.ipa';
@@ -129,10 +128,13 @@ class AppleController extends Controller
             echo json_encode(['status'=>0,'message'=>'缺少参数！','data'=>[]]);die;
         }
         $package_id = isset($request->package_id)?$request->package_id:0;
-        $apple_id = isset($request->apple_id)?$request->apple_id:0;
-        $device = DB::table('device')->where(['udid'=>$udid,'package_id'=>$package_id,'apple_id'=>$apple_id])->first();
+        $device = DB::table('device')->where(['udid'=>$udid,'package_id'=>$package_id])->first();
+
+        $appleList = DB::table('apple')->where('udid_num','<',99)->get();
+        $appleDeveloperInfo = $appleList[0];
+        $apple_id = $appleDeveloperInfo->id;
         $data = [
-            'apple_id'=>$request->apple_id,
+            'apple_id'=>$apple_id,
             'package_id'=>$request->package_id,//todo
             'udid'=>$udid,
             'created_at'=>date('Y-m-d H:i:s')
@@ -152,7 +154,6 @@ class AppleController extends Controller
             echo json_encode(['status'=>0,'message'=>'缺少参数！','data'=>[]]);die;
         }
         $package_id = isset($request->package_id)?$request->package_id:0;
-        $apple_id = isset($request->apple_id)?$request->apple_id:0;
         $device = DB::table('device')->where(['udid'=>$udid,'package_id'=>$package_id])->first();
         if($device&&$device->ipa_url!=''){
             $url = "itms-services://?action=download-manifest&url=$device->plist_url";

@@ -12,7 +12,6 @@
         <th>P8密钥</th>
         <th>P12</th>
         <th>证书ID</th>
-        <th>BuddleID</th>
         <th>创建时间</th>
 
             <th colspan="3">操作</th>
@@ -29,8 +28,9 @@
 
             </td>
             <td>{!! $data->p12_url !!}</td>
+
+
             <td>{!! $data->certificate_id !!}</td>
-            <td>{!! $data->buddle_id !!}</td>
             <td>{!! $data->created_at !!}</td>
             
             <td>

@@ -7,7 +7,8 @@ $_SESSION['udid'] = $_GET['UDID']!=''?$_GET['UDID']:$_SESSION['udid'];
 $apple_id = $_SESSION['apple_id'];
 $package_id = $_SESSION['package_id'];
 $udid = $_SESSION['udid'];
-
+$server = $_SERVER;
+$scheme_url = $server['REQUEST_SCHEME'].$server['HTTP_HOST'];
 
 ?>
 
@@ -118,8 +119,8 @@ body {
 
 <a href = "http://49.235.90.84:8893/api/apple/generatePackage?udid=<?php echo $udid;?>&apple_id=<?php echo $apple_id?>&package_id=<?php echo $package_id?>">test</a>
 -->
-<input type="hidden" id='api' value="https://test.daoyuancloud.com/api/apple/ipa?udid=<?php echo $udid;?>&apple_id=<?php echo $apple_id?>&package_id=<?php echo $package_id?>">
-<input type="hidden" id='init_url' value="https://test.daoyuancloud.com/api/apple/init?udid=<?php echo $udid;?>&apple_id=<?php echo $apple_id?>&package_id=<?php echo $package_id?>">
+<input type="hidden" id='api' value="/api/apple/ipa?udid=<?php echo $udid;?>&apple_id=<?php echo $apple_id?>&package_id=<?php echo $package_id?>">
+<input type="hidden" id='init_url' value="/api/apple/init?udid=<?php echo $udid;?>&apple_id=<?php echo $apple_id?>&package_id=<?php echo $package_id?>">
 
 <br><br>
 
@@ -132,7 +133,7 @@ body {
 
 <!--<img src="qr.png" width ="200">-->
 	
-<script src="https://test.daoyuancloud.com/udid/jquery-2.1.1.min.js"></script>
+<script src="/udid/jquery-2.1.1.min.js"></script>
 
 </div>
 <div id="footer">

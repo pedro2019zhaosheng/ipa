@@ -48,15 +48,6 @@
                             {!! Form::text('certificate_id', isset($apple->certificate_id)?$apple->certificate_id:'', ['class' => 'form-control']) !!}
                         </div>
                 </div>
-
-                <div class="row">
-                    {!! Form::open(['route' => 'robots.store','files' => true]) !!}
-                    {{--                    @include('robots.fields')--}}
-                    <div class="form-group col-sm-12">
-                        {!! Form::label('buddle_id', 'BuddleID:') !!}
-                        {!! Form::text('buddle_id', isset($apple->buddle_id)?$apple->buddle_id:'', ['class' => 'form-control']) !!}
-                    </div>
-                </div>
                 
             </div>
 

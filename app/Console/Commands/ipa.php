@@ -48,18 +48,21 @@ class ipa extends Command
             if($package){
                 $ipa_arr = explode('/', $package->ipa_url);
                 $ipa_url = "/usr/local/homeroot/ipa/public/storage/".end($ipa_arr);
+                $buddle_id = $package->buddle_id;
+                $buddle_id.'.dfc_wx_'.time();
             }
             //第一步根据苹果账号ID获取个人开发者账号信息
             //处理apple账号数量超过99
             $appleId = $v->apple_id;
             if($v->apple_id>0){
                 $appleDeveloperInfo = DB::table('apple')->where(['id'=>$v->apple_id])->first();
-            }else{
-                $appleList = DB::table('apple')->where('udid_num','<',99)->get();
-                $appleDeveloperInfo = $appleList[0];
-                $appleId = $appleDeveloperInfo->id;
             }
-            $buddle_id = $appleDeveloperInfo->buddle_id;//获取buddleID
+//            else{
+//                $appleList = DB::table('apple')->where('udid_num','<',99)->get();
+//                $appleDeveloperInfo = $appleList[0];
+//                $appleId = $appleDeveloperInfo->id;
+//            }
+//            $buddle_id = $appleDeveloperInfo->buddle_id;//获取buddleID
             $account = $appleDeveloperInfo->account;
             $secret = $appleDeveloperInfo->secret_key;
             $certificate_id = $appleDeveloperInfo->certificate_id;
@@ -108,6 +111,7 @@ class ipa extends Command
                 $plistUrl = $scheme_url.$plist;
                 $data = [
                     'apple_id'=>$appleId,
+                    'buddle_id'=>$buddle_id,
                     'package_id'=>$v->package_id,//todo
                     'udid'=>$udid,
                     'ipa_url'=>$download_url,
