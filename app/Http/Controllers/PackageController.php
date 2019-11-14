@@ -90,7 +90,7 @@ class PackageController extends AppBaseController
         $package = [
                 'introduction'=>$data['introduction'],
                 'ipa_url'=>$filename,
-                'buddle_id'=>$data['buddle_id'],
+//                'buddle_id'=>$data['buddle_id'],
                 'icon'=>$icon,
                 'name'=>$data['name'],
                 'version'=>$data['version'],
