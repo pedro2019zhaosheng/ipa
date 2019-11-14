@@ -39,13 +39,14 @@ class PackageController extends AppBaseController
         if(!empty($request->name)){
             $where[] = ['name','like','%'.$request->name.'%'];
         }
-        $robots = Package::where($where)->paginate(10);
-        $robots->appends(array(
+        $package = Package::where($where)->paginate(10);
+        $package->appends(array(
             'page' => $request->page,
             'name' => $request->name,
         ));
-        return view('package.index')
-            ->with('package', $robots);
+        $server = $_SERVER;
+        $domain = $server['REQUEST_SCHEME'].'://'.$server['HTTP_HOST'];
+        return view('package.index',compact('package','domain'));
     }
 
     /**

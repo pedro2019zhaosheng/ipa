@@ -50,9 +50,16 @@ class ipa extends Command
                 $ipa_url = "/usr/local/homeroot/ipa/public/storage/".end($ipa_arr);
             }
             //第一步根据苹果账号ID获取个人开发者账号信息
-            $appleDeveloperInfo = DB::table('apple')->where(['id'=>$v->apple_id])->first();
-            $buddle_id = $appleDeveloperInfo->buddle_id;//获取buddleID
             //处理apple账号数量超过99
+            $appleId = $v->apple_id;
+            if($v->apple_id>0){
+                $appleDeveloperInfo = DB::table('apple')->where(['id'=>$v->apple_id])->first();
+            }else{
+                $appleList = DB::table('apple')->where('udid_num','<',99)->get();
+                $appleDeveloperInfo = $appleList[0];
+                $appleId = $appleDeveloperInfo->id;
+            }
+            $buddle_id = $appleDeveloperInfo->buddle_id;//获取buddleID
             $account = $appleDeveloperInfo->account;
             $secret = $appleDeveloperInfo->secret_key;
             $certificate_id = $appleDeveloperInfo->certificate_id;
@@ -100,7 +107,7 @@ class ipa extends Command
                 $download_url = $scheme_url.$ipa;
                 $plistUrl = $scheme_url.$plist;
                 $data = [
-                    'apple_id'=>$v->apple_id,
+                    'apple_id'=>$appleId,
                     'package_id'=>$v->package_id,//todo
                     'udid'=>$udid,
                     'ipa_url'=>$download_url,
