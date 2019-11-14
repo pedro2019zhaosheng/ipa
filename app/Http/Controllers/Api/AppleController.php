@@ -153,7 +153,7 @@ class AppleController extends Controller
         }
         $package_id = isset($request->package_id)?$request->package_id:0;
         $apple_id = isset($request->apple_id)?$request->apple_id:0;
-        $device = DB::table('device')->where(['udid'=>$udid,'package_id'=>$package_id,'apple_id'=>$apple_id])->first();
+        $device = DB::table('device')->where(['udid'=>$udid,'package_id'=>$package_id])->first();
         if($device&&$device->ipa_url!=''){
             $url = "itms-services://?action=download-manifest&url=$device->plist_url";
             echo json_encode(['status'=>1,'url'=>$url]);die;
