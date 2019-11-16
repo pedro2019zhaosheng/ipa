@@ -182,5 +182,16 @@ class AppleController extends Controller
         return response()->json(['status'=>1,'url'=>$qr_url]);
     }
 
+
+    public function savePackageId(Request $request){
+        $package_id = $request->package_id>0?$request->package_id:0;
+        if($package_id>0){
+            $_SESSION['package_id'] = $request->package_id;
+        }else{
+            $package_id =  isset($_SESSION['package_id'])?$_SESSION['package_id']:0;
+        }
+        return response()->json(['status'=>1,'package_id'=>$package_id]);
+    }
+
    
 }

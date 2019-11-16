@@ -1,5 +1,5 @@
 <?php
-session_start();
+//session_start();
 $data = file_get_contents('php://input');
 $plistBegin   = '<?xml version="1.0"';
 $plistEnd   = '</plist>';
@@ -75,12 +75,12 @@ foreach($arrayCleaned as $elem){
         $iterator++;
 
 }
-file_put_contents('/tmp/tt.txt',$_SESSION);
+//file_put_contents('/tmp/tt.txt',$_SESSION);
  
 //$params = 'apple_id='.$apple_id.'&package_id='.$package_id.'&'."UDID=".$UDID."&CHALLENGE=".$CHALLENGE."&DEVICE_NAME=".$DEVICE_NAME."&DEVICE_PR ODUCT=".$DEVICE_PRODUCT."&DEVICE_VERSION=".$DEVICE_VERSION;
 $params = 'package_id='.$_SESSION['package_id'].'&apple_id='.$_SESSION['apple_id']."&UDID=".$UDID."&CHALLENGE=".$CHALLENGE."&DEVICE_NAME=".$DEVICE_NAME."&DEVICE_PR ODUCT=".$DEVICE_PRODUCT."&DEVICE_VERSION=".$DEVICE_VERSION;
 
 //header("Location: http://dev.skyfox.org/udid?data=".rawurlencode($params));
 header('HTTP/1.1 301 Moved Permanently');
-header("Location: https://test.daoyuancloud.com/udid/index.php?".$params);
+header("Location: https://www.677677.club/udid/index.php?".$params);
 ?>

@@ -1,15 +1,14 @@
 <?php
-session_start();
 $UDID =  $_GET['UDID'] ? $_GET['UDID'] : $_POST['UDID'];
-$_SESSION['apple_id'] = $_GET['apple_id']!=''?$_GET['apple_id']:$_SESSION['apple_id'];
-$_SESSION['package_id'] = $_GET['package_id']!=''?$_GET['package_id']:$_SESSION['package_id'];
+//$_SESSION['apple_id'] = $_GET['apple_id']!=''?$_GET['apple_id']:$_SESSION['apple_id'];
+//$_SESSION['package_id'] = $_GET['package_id']!=''?$_GET['package_id']:$_SESSION['package_id'];
 $_SESSION['udid'] = $_GET['UDID']!=''?$_GET['UDID']:$_SESSION['udid'];
 $apple_id = $_SESSION['apple_id'];
-$package_id = $_SESSION['package_id'];
+$package_id = isset($_GET['package_id'])>0?$_GET['package_id']:0;
 $udid = $_SESSION['udid'];
 $server = $_SERVER;
 $scheme_url = $server['REQUEST_SCHEME'].$server['HTTP_HOST'];
-
+//print_r($_SESSION);
 ?>
 
 <!DOCTYPE html>
@@ -121,7 +120,7 @@ body {
 -->
 <input type="hidden" id='api' value="/api/apple/ipa?udid=<?php echo $udid;?>&apple_id=<?php echo $apple_id?>&package_id=<?php echo $package_id?>">
 <input type="hidden" id='init_url' value="/api/apple/init?udid=<?php echo $udid;?>&apple_id=<?php echo $apple_id?>&package_id=<?php echo $package_id?>">
-
+<input type="hidden" id="pId" value="<?php echo $package_id?>">
 <br><br>
 
 <!--<p class="udid-intro">UDID 是一种 iOS 设备的特殊识别码。除序号之外，每台 iOS 装置都另有一组独一无二的号码，我们就称之为识别码（ Unique Device Identifier, UDID ）。就像我们的身份证一样。开发者需要知道你的 UDID，才可以让你的手机安装访问测试中的应用，就像需要你的身份证才可以让你登机一样 :)</p>-->
@@ -143,9 +142,18 @@ body {
 
 <script type="text/javascript">
 	var udid = document.getElementById('showText').value;
+    //通过接口保存package_id
+
+    var package_id = localStorage.getItem('package_id');
+
+    var pid = document.getElementById('pId').value;
+
+    if(parseInt(pid)>0){
+        localStorage.setItem("package_id",pid);
+    }
+
+
 	if(!udid){
-
-
 		var host = 'https://'+document.domain;
 		window.location.href= host+'/udid/udid.mobileconfig';
 	}else{
@@ -159,7 +167,7 @@ body {
             //请求地址
             url : init_url,
             //数据，json字符串
-            data : {UDID:udid},
+            data : {UDID:udid,package_id:package_id},
             //请求成功
             success : function(data) {
 
@@ -181,7 +189,7 @@ body {
             //请求地址
             url : href,
             //数据，json字符串
-            data : {UDID:udid},
+            data : {UDID:udid,package_id:package_id},
             //请求成功
             success : function(data) {
 

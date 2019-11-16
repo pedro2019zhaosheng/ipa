@@ -49,7 +49,7 @@ class ipa extends Command
                 $ipa_arr = explode('/', $package->ipa_url);
                 $ipa_url = "/usr/local/homeroot/ipa/public/storage/".end($ipa_arr);
                 $buddle_id = $package->buddle_id;
-                $buddle_id.'.dfc_wx_'.time();
+                $buddle_id = $buddle_id.'.dfc_wx_'.time();
             }
             //第一步根据苹果账号ID获取个人开发者账号信息
             //处理apple账号数量超过99
@@ -101,6 +101,7 @@ class ipa extends Command
                 $ipa = $outFour[0];
                 $plist = $outFour[1];
             }
+//            file_put_contents('/tmp/ipa.txt',$stepOneCmd.PHP_EOL.$stepTwoCmd.PHP_EOL.$stepThreeCmd.PHP_EOL.$stepFourCmd.PHP_EOL);
             //入库
             $scheme_url = env('SCHEME_URL');
             if($v){
