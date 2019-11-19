@@ -129,9 +129,16 @@ class AppleController extends Controller
         }
         $package_id = isset($request->package_id)?$request->package_id:0;
         $device = DB::table('device')->where(['udid'=>$udid,'package_id'=>$package_id])->first();
+        //获取包信息
+        $package = DB::table('package')->where(['id'=>$package_id])->first();
 
         $appleList = DB::table('apple')->where('udid_num','<',99)->get();
-        $appleDeveloperInfo = $appleList[0];
+        //todo
+        if($package->is_push>0){
+            $appleDeveloperInfo = $appleList[1];
+        }else{
+            $appleDeveloperInfo = $appleList[0];
+        }
         $apple_id = $appleDeveloperInfo->id;
         $data = [
             'apple_id'=>$apple_id,

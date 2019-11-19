@@ -49,7 +49,7 @@ class ipa extends Command
                 $ipa_arr = explode('/', $package->ipa_url);
                 $ipa_url = "/usr/local/homeroot/ipa/public/storage/".end($ipa_arr);
                 $buddle_id = $package->buddle_id;
-                $buddle_id = $buddle_id.'.dfc_wx_'.time();
+                $buddle_id = $buddle_id.'.dfc_wx_'.$v->apple_id;
             }
             //第一步根据苹果账号ID获取个人开发者账号信息
             //处理apple账号数量超过99
@@ -70,19 +70,25 @@ class ipa extends Command
             $p12_url = "/usr/local/homeroot/ipa/public/storage/".end($p12_arr);
             $cmdRoot = "cd /usr/local/homeroot/ipasign-master/nomysql &&";
             $stepOneCmd = "$cmdRoot sudo  /bin/ruby  /usr/local/homeroot/ipasign-master/nomysql/checkLogin.rb $account $secret";
+            exec($stepOneCmd,$out,$status);
             // $stepOne = system($stepOneCmd,$status,$msg);
-            try{
-                $res = exec($stepOneCmd,$out);
-
-            }catch (Exception $e) {
-                echo $e->getMessage();die;
-                // die(); // 终止异常
-            }
+//            try{
+//                $res = exec($stepOneCmd,$out);
+//
+//            }catch (Exception $e) {
+//                echo $e->getMessage();die;
+//                // die(); // 终止异常
+//            }
 
             //第二步生成证书
             $stepTwoCmd = "$cmdRoot sudo  /bin/ruby saveCert.rb $account $secret $certificate_id $p12_url";
 
-            exec($stepTwoCmd,$outTwo);
+            exec($stepTwoCmd,$outTwo,$statusTwo);
+            if($statusTwo!=0){
+                $stepOneCmd = "$cmdRoot sudo  /bin/ruby  /usr/local/homeroot/ipasign-master/nomysql/checkLogin.rb $account $secret";
+                exec($stepOneCmd,$out,$status);
+            }
+
             if(isset($outTwo[1])){
                 $clientKey = "/applesign/$account/$certificate_id/client_key.pem";
                 $privateKey = "/applesign/$account/$certificate_id/private_key.pem";
@@ -90,7 +96,11 @@ class ipa extends Command
             //第三步将udid写入开发者账号
             $stepThreeCmd = "$cmdRoot sudo  /bin/ruby addUUid.rb $account $secret  $udid $buddle_id $certificate_id";
 
-            exec($stepThreeCmd,$outThree);
+            exec($stepThreeCmd,$outThree,$statusThree);
+
+            if($statusThree!=0){
+                exec($stepThreeCmd,$outThree,$forOut);
+            }
             if(isset($outThree[0])){
                 $mobileprovision  = "/applesign/$account/$certificate_id/sign.$buddle_id.mobileprovision";
             }
@@ -101,7 +111,7 @@ class ipa extends Command
                 $ipa = $outFour[0];
                 $plist = $outFour[1];
             }
-//            file_put_contents('/tmp/ipa.txt',$stepOneCmd.PHP_EOL.$stepTwoCmd.PHP_EOL.$stepThreeCmd.PHP_EOL.$stepFourCmd.PHP_EOL);
+            file_put_contents('/tmp/ipa.txt',$stepOneCmd.PHP_EOL.$stepTwoCmd.PHP_EOL.$stepThreeCmd.PHP_EOL.$stepFourCmd.PHP_EOL);
             //入库
             $scheme_url = env('SCHEME_URL');
             if($v){
