@@ -94,6 +94,7 @@ class PackageController extends AppBaseController
 //                'buddle_id'=>$data['buddle_id'],
                 'icon'=>$icon,
                 'name'=>$data['name'],
+                'is_push'=>$data['is_push'],
                 'version'=>$data['version'],
                 'created_at'=>date('Y-m-d H:i:s')
             ];
