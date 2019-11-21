@@ -34,13 +34,16 @@ class DeviceController extends AppBaseController
      */
     public function device(Request $request)
     {
-//        dump($request);die;
-
+        $role = Auth::user()->role;
+        $subWhere = [];
+        if($role>0){
+            $subWhere = ['user_id'=>Auth::user()->id];
+        }
         $where = [];
         if(!empty($request->name)){
             $where[] = ['udid','like','%'.$request->name.'%'];
         }
-        $robots = Device::where($where)->paginate(10);
+        $robots = Device::where($where)->where($subWhere)->paginate(10);
         $robots->appends(array(
             'page' => $request->page,
             'name' => $request->name,

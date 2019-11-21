@@ -1,0 +1,465 @@
+.app {
+  width: 100%;
+  color: #333333;
+  line-height: 1.38462;
+  font-size: .373333rem;
+  font-weight: 400;
+  background: #ffffff;
+}
+
+.app .app_container {
+  width: 100%;
+  overflow: hidden;
+}
+
+.app .app_container .app_info {
+  width: 87.5%;
+  margin: .533333rem auto .426667rem;
+  display: flex;
+  display: -webkit-flex;
+  justify-content: space-between;
+  -webkit-justify-content: space-between;
+}
+
+.app .app_container .app_info .app_left {
+  width: 3.066667rem;
+  height: 3.066667rem;
+  background: #ffffff;
+}
+
+.app .app_container .app_info .app_left img {
+  width: 100%;
+  height: 100%;
+  border-radius: .666667rem;
+}
+
+.app .app_container .app_info .app_right {
+  /* width: 5.253333rem; */
+  width: 60%;
+}
+
+.app .app_container .app_info .app_right .app_name {
+  padding: .08rem 0 0 .08rem;
+  min-height: 1.84rem;
+}
+
+.app .app_container .app_info .app_right .app_name .app_name_one {
+  color: #111111;
+  font-size: .533333rem;
+  font-weight: bold;
+  line-height: 1.2223;
+  letter-spacing: .02em;
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app .app_container .app_info .app_right .app_name .app_name_one .name{
+  max-width: 4rem;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1.2223;
+  letter-spacing: .02em;
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app .app_container .app_info .app_right .app_name .app_name_one .num {
+  font-size: .28rem;
+  font-weight: 700;
+  line-height: 1.2223;
+  color: #8e8e93;
+  margin: 0 0 .08rem .266667rem;
+  display: inline-block;
+  letter-spacing: .04em;
+  vertical-align: middle;
+  padding: .026667rem .08rem;
+  border: 1px solid #8e8e93;
+  border-radius: .08rem;
+  text-align: center;
+  white-space: nowrap;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.app .app_container .app_info .app_right .app_name .app_no, .app .app_container .app_info .app_right .app_name .app_num {
+  color: #8e8e93;
+  margin-top: .053333rem;
+}
+
+.app .app_container .app_info .app_right .app_click {
+  display: flex;
+  display: -webkit-flex;
+  justify-content: space-between;
+  -webkit-justify-content: space-between;
+}
+
+.app .app_container .app_info .app_right .app_click .install_btn {
+  max-width: 4.2rem;
+  height: .853333rem;
+  border-radius: .426667rem;
+  padding: 0 .3rem;
+  background-color: #017afe;
+  color: #fff;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+}
+
+.app .app_container .app_info .app_right .app_click .big_btn {
+  padding: 0 .666667rem;
+}
+
+.app .app_container .app_info .app_right .app_click .install_btn span {
+  font-size: .346667rem;
+}
+
+.app .app_container .app_info .app_right .app_click .progress_bar {
+  width: 4rem;
+  height: .853333rem;
+  line-height: .853333rem;
+  background-color: #7f7f7f;
+  overflow: hidden;
+}
+
+.app .app_container .app_info .app_right .app_click .small_bar {
+  text-align: center;
+}
+
+.app .app_container .app_info .app_right .app_click .progress_bar .progress_txt {
+  line-height: .853333rem;
+  position: relative;
+  color: #ffffff;
+  font-size: .42rem;
+  padding-left: 0.6rem;
+  z-index: 100;
+}
+
+.app .app_container .app_info .app_right .app_click .progress_bar .small_txt {
+  font-size: 0.33rem;
+  padding-left: 0rem;
+}
+
+.app .app_container .app_info .app_right .app_click .progress_bar .layui-progress-bar {
+  height: .853333rem;
+  line-height: .853333rem;
+  border-radius: .426667rem;
+  background-color: #017afe;
+}
+
+.app .app_container .app_info .app_right .app_click .progress_bar .layui-progress-bar .layui-progress-text {
+  line-height: .853333rem;
+  font-size: .42rem;
+  padding-left: 2.5rem;
+}
+
+.app .app_container .app_info .app_right .app_click .disable_btn {
+  background-color: #7f7f7f;
+}
+
+.app .app_container .app_info .app_right .app_click .install_ask {
+  width: .853333rem;
+  height: .853333rem;
+  border-radius: .853333rem;
+  font-weight: 700;
+  background-color: #017afe;
+  color: #fff;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+}
+
+.app .app_container .app_info .app_right .app_click .fresh_btn img {
+  width: .533333rem;
+}
+
+.app .app_container .p_wrap {
+  width: 87.5%;
+  margin: 0 auto;
+}
+
+.app .app_container .p_border {
+  padding: .533333rem 0;
+  border-top: 1px solid #e5e5e5;
+}
+
+.app .app_container .title_big {
+  font-weight: 600;
+  margin-bottom: .453333rem;
+  -webkit-flex-shrink: 1;
+  -ms-flex-negative: 1;
+  flex-shrink: 1;
+  font-size: .533333rem;
+  line-height: 1.2;
+  letter-spacing: .02em;
+  color: #111111;
+}
+
+.app .app_container .brief .brief_top {
+  padding-bottom: .666667rem;
+  display: flex;
+  display: -webkit-flex;
+  justify-content: space-between;
+  -webkit-justify-contetn: space-between;
+}
+
+.app .app_container .brief .brief_top .brief_font {
+  color: #d9d9d9;
+  font-size: .32 rem;
+}
+
+.app .app_container .brief .brief_top .brief_top_l {
+  width: 45%;
+  text-align: left;
+}
+
+.app .app_container .brief .brief_top .brief_top_l .brief_top_l_t {
+  display: inline-block;
+  font-size: .426667rem;
+  font-weight: 700;
+  color: #8e8e93;
+}
+
+.app .app_container .brief .brief_top .brief_top_l .brief_top_l_t .start {
+  width: 2.053333rem;
+  height: .346667rem;
+  margin-left: .08rem;
+  display: inline-block;
+  background-image: url(../images/web/star.png);
+  background-size: 100% 100%;
+}
+
+.app .app_container .brief .brief_top .brief_top_c {
+  width: 25%;
+  text-align: center;
+  margin-top: -.066667rem;
+}
+
+.app .app_container .brief .brief_top .brief_top_c .brief_top_l_c {
+  display: inline-block;
+  font-size: .426667rem;
+  font-weight: 700;
+  color: #8e8e93;
+}
+
+.app .app_container .brief .brief_top .brief_top_c .brief_top_l_c .sign {
+  vertical-align: super;
+  font-size: .32rem;
+}
+
+.app .app_container .brief .brief_top .brief_top_c .brief_top_l_c .num {
+  margin-left: -0.1rem;
+}
+
+.app .app_container .brief .brief_top .brief_top_r {
+  width: 25%;
+  text-align: right;
+}
+
+.app .app_container .brief .brief_top .brief_top_r .brief_top_l_r {
+  display: inline-block;
+  font-size: .426667rem;
+  font-weight: 700;
+  color: #8e8e93;
+}
+
+.app .app_container .brief .brief_des {
+  border-top: 1px solid #e5e5e5;
+  padding: .6rem 0;
+}
+
+.app .app_container .brief .brief_des .des_block {
+  width: 99.1%;
+  max-height: 3.2rem;
+  line-height: .546667rem;
+  overflow: hidden;
+  color: #000000;
+}
+
+.app .app_container .score .score_left, .app .app_container .score .score_right {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.app .app_container .score .score_left {
+  width: 28%;
+  margin-left: 3%;
+  text-align: center;
+  font-weight: bold;
+}
+
+.app .app_container .score .score_left .score_l-t {
+  line-height: 1.146667rem;
+  font-size: 1.6rem;
+  letter-spacing: -.066667rem;
+  color: #4c4c50;
+}
+
+.app .app_container .score .score_left .score_l_b {
+  color: #8e8e93;
+  font-size: .346667rem;
+  margin-top: .32rem;
+}
+
+.app .app_container .score .score_right {
+  width: 63.3%;
+  margin-left: 3%;
+}
+
+.app .app_container .score .score_right .score_r_start img {
+  width: 100%;
+}
+
+.app .app_container .score .score_right .score_num {
+  font-size: .32rem;
+  text-align: right;
+  color: #8e8e93;
+  margin-top: .32rem;
+}
+
+.app .app_container .more_msg .msg_list-wrap {
+  display: table;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.app .app_container .more_msg .msg_list-wrap .msg_list {
+  border-bottom: 1px solid #e5e5e5;
+  display: table-row;
+}
+
+.app .app_container .more_msg .msg_list-wrap .msg_list .msg_list_l, .app .app_container .more_msg .msg_list-wrap .msg_list .msg_list_r {
+  font-size: .32rem;
+  display: table-cell;
+  vertical-align: initial;
+}
+
+.app .app_container .more_msg .msg_list-wrap .msg_list .msg_list_l {
+  text-align: left;
+  margin-left: 3.28358%;
+  white-space: nowrap;
+  padding: .266667rem 0;
+  color: #8e8e93;
+}
+
+.app .app_container .more_msg .msg_list-wrap .msg_list .msg_list_r {
+  text-align: right;
+  padding-left: .533333rem;
+  margin-left: 3.28358%;
+}
+
+.app .app_container .more_msg .msg_list-wrap .msg_list:last-child {
+  border: none;
+}
+
+.app .app_container .disclaimer {
+  background-color: #eee;
+  padding: .186667rem;
+  color: #a9a9a9;
+}
+
+.app .app_container .disclaimer p {
+  font-size: .266667rem;
+  line-height: 1.5;
+}
+
+.app .app_container .disclaimer p:nth-of-type(2) {
+  text-indent: .533333rem;
+}
+
+.down_popup {
+  padding-top: 1rem;
+  width: 8rem;
+  margin: 0 auto;
+  border-radius: 0.2rem;
+  position: relative;
+  display: none;
+}
+
+.down_popup .swiper_banner {
+  width: 100%;
+  position: relative;
+}
+
+.down_popup .swiper_banner .swiper-container {
+  width: 90%;
+  margin: 0 auto;
+}
+
+.down_popup .swiper_banner .swiper-wrapper .swiper-slide img {
+  height: 5.5rem;
+  min-width: 100%;
+  margin: 0 auto;
+  border-radius: 0.2rem;
+}
+
+.down_popup .swiper_banner .swiper-wrapper .swiper-slide .step {
+  text-align: center;
+  font-size: 0.4rem;
+  margin-top: 0.7rem;
+  font-weight: bold;
+}
+
+.down_popup .swiper_banner .swiper-wrapper .swiper-slide .step_dec {
+  text-align: center;
+  font-size: 0.3rem;
+  margin-top: 0.2rem;
+  font-weight: bold;
+  padding-bottom: 0.7rem;
+}
+
+.down_popup .swiper_banner .swiper-wrapper .swiper-slide .step_dec span {
+  color: #177eff;
+}
+.down_popup .no_install{
+  padding-top: 0.2rem;
+  padding-bottom: 0.5rem;
+  font-size: .4rem;
+  color: #177eff;
+  display: flex;
+  display: -webkit-flex;
+  align-items: center;
+  -webkit-align-items: center;
+  justify-content: center;
+  -webkit-justify-content:center;
+}
+
+/* safari */
+.no_safar {
+  width: 100%;
+  height: 100%;
+  z-index: 600;
+  display: none;
+}
+
+.no_safar .tip_img {
+  z-index: 500;
+  position: fixed;
+  left: 1.2rem;
+  top: .1rem;
+}
+
+.no_safar .tip_img img {
+  width: 21rem;
+}
+
+.no_safar .model {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000000;
+  opacity: 0.7;
+  filter: alpha(opacity=70);
+  z-index: 499;
+}

@@ -12,6 +12,7 @@
         <th>P8密钥</th>
         <th>P12</th>
         <th>证书ID</th>
+        <th>是否是推送证书</th>
         <th>创建时间</th>
 
             <th colspan="3">操作</th>
@@ -31,6 +32,7 @@
 
 
             <td>{!! $data->certificate_id !!}</td>
+            <td>{!! $data->is_push==0?'否':'是' !!}</td>
             <td>{!! $data->created_at !!}</td>
             
             <td>

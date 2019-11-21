@@ -34,12 +34,16 @@ class PackageController extends AppBaseController
      */
     public function package(Request $request)
     {
-//        dump($request);die;
+        $role = Auth::user()->role;
+        $subWhere = [];
+        if($role>0){
+            $subWhere = ['user_id'=>Auth::user()->id];
+        }
         $where = [];
         if(!empty($request->name)){
             $where[] = ['name','like','%'.$request->name.'%'];
         }
-        $package = Package::where($where)->paginate(10);
+        $package = Package::where($where)->where($subWhere)->paginate(10);
         $package->appends(array(
             'page' => $request->page,
             'name' => $request->name,
@@ -91,11 +95,13 @@ class PackageController extends AppBaseController
         $package = [
                 'introduction'=>$data['introduction'],
                 'ipa_url'=>$filename,
-//                'buddle_id'=>$data['buddle_id'],
+                'buddle_id'=>$data['buddle_id'],
+                'apple_id'=>$data['apple_id'],
                 'icon'=>$icon,
                 'name'=>$data['name'],
                 'is_push'=>$data['is_push'],
                 'version'=>$data['version'],
+                'user_id'=>Auth::user()->id,
                 'created_at'=>date('Y-m-d H:i:s')
             ];
         if($data['id']>0){

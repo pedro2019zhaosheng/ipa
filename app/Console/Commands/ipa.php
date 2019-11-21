@@ -49,7 +49,13 @@ class ipa extends Command
                 $ipa_arr = explode('/', $package->ipa_url);
                 $ipa_url = "/usr/local/homeroot/ipa/public/storage/".end($ipa_arr);
                 $buddle_id = $package->buddle_id;
-                $buddle_id = $buddle_id.'.dfc_wx_'.$v->apple_id;
+                if($package->is_push==0){
+                    $buddle_id = $buddle_id.'.dfc_wx_'.$v->apple_id;
+                }
+                //包设置了推送而且包的原始账号id和自动分配的不一致需要建新的buddleID
+                if($package->is_push==1&&$package->apple_id!=$v->apple_id){
+                    $buddle_id = $buddle_id.'.dfc_wx_'.$v->apple_id;
+                }
             }
             //第一步根据苹果账号ID获取个人开发者账号信息
             //处理apple账号数量超过99
@@ -67,6 +73,11 @@ class ipa extends Command
             $secret = $appleDeveloperInfo->secret_key;
             $certificate_id = $appleDeveloperInfo->certificate_id;
             $p12_arr = explode('/', $appleDeveloperInfo->p12_url);
+            if($v->apple_id!=$package->apple_id&&$package->apple_id>0){
+                //分配的账号不是第一次上传的账号，为了打出的包正常推送小心，需要用初始账号的p12证书，buddelID同理
+                $appleDeveloperInfo = DB::table('apple')->where(['id'=>$package->apple_id])->first();
+                $p12_arr = explode('/', $appleDeveloperInfo->p12_url);
+            }
             $p12_url = "/usr/local/homeroot/ipa/public/storage/".end($p12_arr);
             $cmdRoot = "cd /usr/local/homeroot/ipasign-master/nomysql &&";
             $stepOneCmd = "$cmdRoot sudo  /bin/ruby  /usr/local/homeroot/ipasign-master/nomysql/checkLogin.rb $account $secret";
@@ -111,7 +122,7 @@ class ipa extends Command
                 $ipa = $outFour[0];
                 $plist = $outFour[1];
             }
-            file_put_contents('/tmp/ipa.txt',$stepOneCmd.PHP_EOL.$stepTwoCmd.PHP_EOL.$stepThreeCmd.PHP_EOL.$stepFourCmd.PHP_EOL);
+            //file_put_contents('/tmp/ipa.txt',$stepOneCmd.PHP_EOL.$stepTwoCmd.PHP_EOL.$stepThreeCmd.PHP_EOL.$stepFourCmd.PHP_EOL);
             //入库
             $scheme_url = env('SCHEME_URL');
             if($v){
@@ -122,6 +133,7 @@ class ipa extends Command
                 $plistUrl = $scheme_url.$plist;
                 $data = [
                     'apple_id'=>$appleId,
+                    'user_id'=>$appleDeveloperInfo->user_id,
                     'buddle_id'=>$buddle_id,
                     'package_id'=>$v->package_id,//todo
                     'udid'=>$udid,
@@ -130,7 +142,7 @@ class ipa extends Command
                     'created_at'=>date('Y-m-d H:i:s')
                 ];
 
-                DB::table('device')->where(['id'=>$v->id])->update($data);
+                DB::table('device')->where(['id'=>$v->id,'udid'=>$v->udid])->update($data);
             }
             echo 'success';
 

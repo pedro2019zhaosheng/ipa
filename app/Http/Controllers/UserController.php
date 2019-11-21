@@ -20,14 +20,19 @@ class UserController extends BaseController
     /*
      * construct
      */
-   public function __construct()
+   public function __construct(Request $request)
    {
+       $controller = $request->route()->getAction();
+       $controllerArr = explode('@',$controller['controller']);
+       list($c,$a) = $controllerArr;
+       //将action放入缓存
+       $_SESSION['CurrentAction'] = $a;
    }
    /*
     * @desc userList
     */
    public function user(Request $request){
-        $where[] = ['role','=',2];
+        $where[] = ['role','=',1];
        if(!empty($request->name)){
            $where[] = ['name','like','%'.$request->name.'%'];
        }

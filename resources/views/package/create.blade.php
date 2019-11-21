@@ -53,12 +53,16 @@
                             {!! Form::label('account', '简介:') !!}
                             {!! Form::text('introduction', isset($package->introduction)?$package->introduction:'' , ['class' => 'form-control']) !!}
                         </div>
-                    <label class="checkbox-inline">
+                    <div class="checkbox-inline">
                         {!! Form::label('status', '是否推送:') !!}
                         {!! Form::radio('is_push', '1', isset($package->is_push)&&$package->is_push==1?true:false) !!} 开启
                         {!! Form::radio('is_push', '0', isset($package->is_push)&&$package->is_push==0?true:false) !!} 关闭
 
-                    </label>
+                    </div>
+                    <div class="form-group col-sm-12">
+                        {!! Form::label('apple_id', '苹果账号ID:') !!}
+                        {!! Form::text('apple_id', isset($package->apple_id)?$package->apple_id:'' , ['class' => 'form-control']) !!}
+                    </div>
                 </div>
 
 

@@ -34,13 +34,17 @@ class AppleController extends AppBaseController
      */
     public function apple(Request $request)
     {
+        $role = Auth::user()->role;
+        $subWhere = [];
+        if($role>0){
+            $subWhere = ['user_id'=>Auth::user()->id];
+        }
 //        dump($request);die;
-
         $where = [];
         if(!empty($request->name)){
             $where[] = ['account','like','%'.$request->name.'%'];
         }
-        $robots = Apple::where($where)->paginate(10);
+        $robots = Apple::where($where)->where($subWhere)->paginate(10);
         $robots->appends(array(
             'page' => $request->page,
             'name' => $request->name,
@@ -90,8 +94,10 @@ class AppleController extends AppBaseController
                 'account'=>$data['account'],
                 'secret_key'=>$data['secret_key'],
                 'p12_url'=>$filename,
+                'is_push'=>$request->is_push,
                 'buddle_id'=>$request->buddle_id,
                 'certificate_id'=>$request->certificate_id,
+                'user_id'=>Auth::user()->id,
                 'created_at'=>date('Y-m-d H:i:s')
             ];
         if($data['id']>0){

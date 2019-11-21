@@ -34,7 +34,7 @@
                     <!-- Submit Field -->
                     <div class="form-group">
                         {!! Form::submit('保存', ['class' => 'btn btn-primary']) !!}
-                        <a href="{!! route('robots.index') !!}" class="btn btn-default">取消</a>
+                        <a href="{!! url('user/user') !!}" class="btn btn-default">取消</a>
                     </div>
                     {!! Form::close() !!}
                 </div>

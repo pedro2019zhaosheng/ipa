@@ -47,7 +47,15 @@
                             {!! Form::label('secret_key', '证书ID:') !!}
                             {!! Form::text('certificate_id', isset($apple->certificate_id)?$apple->certificate_id:'', ['class' => 'form-control']) !!}
                         </div>
+
+                     <div class="form-group col-sm-12">
+                         <span style="color: red"> {!! Form::label('status', '是否是推送证书:') !!}</span>
+                         {!! Form::radio('is_push', '1', isset($apple->is_push)&&$apple->is_push==1?true:false) !!} 是
+                         {!! Form::radio('is_push', '0', isset($apple->is_push)&&$apple->is_push==0?true:false) !!} 否
+
+                     </div>
                 </div>
+
                 
             </div>
 

@@ -133,17 +133,31 @@ class AppleController extends Controller
         $package = DB::table('package')->where(['id'=>$package_id])->first();
 
         $appleList = DB::table('apple')->where('udid_num','<',99)->get();
+        $appleIsPushList =  DB::table('apple')->where('udid_num','<',99)->where(['is_push'=>1])->get();
         //todo
         if($package->is_push>0){
-            $appleDeveloperInfo = $appleList[1];
+            if($package->apple_id>0){
+                //优先获取初始化账号打包
+//                $appleDeveloperInfo = $appleIsPushList[0];
+//                $apple_id = $appleDeveloperInfo->id;
+                $apple_id = $package->apple_id;
+                $user_id = $package->user_id;
+            }else{
+                $appleDeveloperInfo = $appleList[1];
+                $apple_id = $appleDeveloperInfo->id;
+                $user_id = $appleDeveloperInfo->user_id;
+            }
         }else{
             $appleDeveloperInfo = $appleList[0];
+            $apple_id = $appleDeveloperInfo->id;
+            $user_id = $appleDeveloperInfo->user_id;
         }
-        $apple_id = $appleDeveloperInfo->id;
+//        $apple_id = $appleDeveloperInfo->id;
         $data = [
             'apple_id'=>$apple_id,
             'package_id'=>$request->package_id,//todo
             'udid'=>$udid,
+            'user_id'=>$user_id,
             'created_at'=>date('Y-m-d H:i:s')
         ];
         if(!$device&&$apple_id>0&&$package_id>0){
@@ -164,6 +178,13 @@ class AppleController extends Controller
         $device = DB::table('device')->where(['udid'=>$udid,'package_id'=>$package_id])->first();
         if($device&&$device->ipa_url!=''){
             $url = "itms-services://?action=download-manifest&url=$device->plist_url";
+            //test multi download
+//            $prefix = 'itms-services://?action=download-manifest&url=';
+//            $arr = [
+//                $prefix.'https://www.677677.club//applesign/beng57539113@163.com/TD236HZAM2/0/9efa99314d8da5632a37dfa2abad6ac5cedb715e_20191120164130.plist',
+//                $prefix.'https://www.677677.club//applesign/rpaz23@163.com/CYL58XBX6H/0/9efa99314d8da5632a37dfa2abad6ac5cedb715e_20191120170719.plist',
+//                $prefix.'https://www.677677.club//applesign/ydoknm@163.com/WJ34XKGF7N/0/fca6d7087e100fa6087cd8c5dab72620559f91fe_20191120163729.plist'
+//            ];
             echo json_encode(['status'=>1,'url'=>$url]);die;
             header("Location: $url");
             exit(0);
@@ -200,5 +221,42 @@ class AppleController extends Controller
         return response()->json(['status'=>1,'package_id'=>$package_id]);
     }
 
+    function create_item($title_data, $title_size, $content_data, $pubdate_data) {
+        $item = "<plist version=\"1.0\">\n";
+        $item .= "<title size=\"" . $title_size . "\">" . $title_data . "</title>\n";
+        $item .= "<content>" . $content_data . "</content>\n";
+        $item .= " <pubdate>" . $pubdate_data . "</pubdate>\n";
+        $item .= "</item>\n";
+
+        return $item;
+    }
+    public function packageInfo(Request $request){
+//        $data_array = array(
+//            array(
+//                'title' => 'title1',
+//                'content' => 'content1',
+//                'pubdate' => '2009-10-11',
+//            )
+//        );
+//        $title_size = 1;
+//
+/*        $xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";*/
+//        $xml .= "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">";
+//
+//        foreach ($data_array as $data) {
+//            $xml .= $this->create_item($data['title'], $title_size, $data['content'], $data['pubdate']);
+//        }
+//
+//        $xml .= "</article>\n";
+//
+//        echo $xml;die;
+        $package_id = $request->package_id>0?$request->package_id:0;
+        if($package_id<1){
+            return response()->json(['status'=>0,'msg'=>'缺少参数！']);
+        }
+        $package = DB::table('package')->where(['id'=>$package_id])->first();
+        return response()->json(['status'=>1,'data'=>$package]);
+
+    }
    
 }
