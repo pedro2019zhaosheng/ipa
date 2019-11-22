@@ -38,11 +38,11 @@ class ipa extends Command
      */
     public function handle()
     {
-        $deviceList = DB::table('device')->get();
+        $deviceList = DB::table('device')->where('ipa_url','=','')->get();
         foreach($deviceList as $k=>$v){
-            if($v->ipa_url){
-                continue;
-            }
+//            if($v->ipa_url!=''){
+//                continue;
+//            }
             $udid = $v->udid;
             $package = DB::table('package')->where(['id'=>$v->package_id])->first();
             if($package){
@@ -115,17 +115,22 @@ class ipa extends Command
             if(isset($outThree[0])){
                 $mobileprovision  = "/applesign/$account/$certificate_id/sign.$buddle_id.mobileprovision";
             }
+            $outFour = [];//重新赋值
             //第四步生成ipa包
             $stepFourCmd = "$cmdRoot sudo /bin/ruby signIpa.rb $account  $udid  $ipa_url $buddle_id $certificate_id /applesign/$account/$certificate_id/sign.$buddle_id.mobileprovision /applesign/$account/$certificate_id/client_key.pem /applesign/$account/$certificate_id/private_key.pem";
             exec($stepFourCmd,$outFour,$re);
+            $plist = '';
+            $ipa = '';
             if(isset($outFour[0])){
                 $ipa = $outFour[0];
                 $plist = $outFour[1];
             }
-            //file_put_contents('/tmp/ipa.txt',$stepOneCmd.PHP_EOL.$stepTwoCmd.PHP_EOL.$stepThreeCmd.PHP_EOL.$stepFourCmd.PHP_EOL);
             //入库
             $scheme_url = env('SCHEME_URL');
-            if($v){
+            if($re!=1){
+//                file_put_contents('/tmp/ipa.txt',$stepOneCmd.PHP_EOL.$stepTwoCmd.PHP_EOL.$stepThreeCmd.PHP_EOL.$stepFourCmd.PHP_EOL
+//                    .$plist.PHP_EOL,FILE_APPEND);
+
                 // $download_url = 'http://'.$_SERVER['HTTP_HOST'].'/storage/'.$filename;
                 // $plistUrl = 'https://'.$_SERVER['HTTP_HOST'].'/storage/'.$plistName;//todo
                 // $plistUrl = "https://test.daoyuancloud.com/install_ipa/".$plistName;
@@ -141,8 +146,7 @@ class ipa extends Command
                     'plist_url'=>$plistUrl,
                     'created_at'=>date('Y-m-d H:i:s')
                 ];
-
-                DB::table('device')->where(['id'=>$v->id,'udid'=>$v->udid])->update($data);
+                DB::table('device')->where(['id'=>$v->id])->update($data);
             }
             echo 'success';
 
