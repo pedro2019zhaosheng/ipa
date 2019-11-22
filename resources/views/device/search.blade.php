@@ -19,8 +19,8 @@
         <label class="checkbox-inline">
             {!! Form::submit('搜索', ['class' => 'btn btn-primary pull-right']) !!}
         </label>
-             <a class="btn btn-primary pull-right" style="margin-right:400px;margin-top: 0px;margin-bottom: 5px" href="{!! url('device/create') !!}">添加
-             </a>
+             {{--<a class="btn btn-primary pull-right" style="margin-right:400px;margin-top: 0px;margin-bottom: 5px" href="{!! url('device/create') !!}">添加--}}
+             {{--</a>--}}
 
         </div>
 

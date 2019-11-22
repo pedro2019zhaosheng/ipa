@@ -39,3 +39,4 @@ Route::any('apple/qrcode','Api\AppleController@qrcode')->name('qrcode');
 
 Route::any('apple/savePackageId','Api\AppleController@savePackageId')->name('savePackageId');
 Route::any('apple/packageInfo','Api\AppleController@packageInfo')->name('packageInfo');
+Route::any('apple/downStatistics','Api\AppleController@downStatistics')->name('downStatistics');//下载统计

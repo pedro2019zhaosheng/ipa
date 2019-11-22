@@ -258,5 +258,19 @@ class AppleController extends Controller
         return response()->json(['status'=>1,'data'=>$package]);
 
     }
+
+    public function downStatistics(Request $request){
+        $package_id = isset($request->package_id)?$request->package_id:0;
+        if($package_id<1){
+            return response()->json(['status'=>0,'msg'=>'缺少参数！']);
+        }
+        $package = DB::table('package')->where(['id'=>$package_id])->first();
+        $package->download_num = empty($package->download_num)?0:$package->download_num;
+        $data = array(
+            'download_num'=>$package->download_num++
+        );
+        DB::table('package')->where(['id'=>$package_id])->update($data);
+        return response()->json(['status'=>1,'data'=>$package]);
+    }
    
 }

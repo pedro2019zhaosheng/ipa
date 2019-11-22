@@ -12,7 +12,7 @@
         <th>设备ID</th>
         <th>创建时间</th>
 
-            <th colspan="3">操作</th>
+            {{--<th colspan="3">操作</th>--}}
         </tr>
     </thead>
     <tbody>
@@ -30,8 +30,8 @@
             <td>
                 {!! Form::open(['route' => ['device.destroy', $data->id], 'method' => 'get']) !!}
                 <div class='btn-group'>
-                    <a href="{!! route('device.edit', [$data->id]) !!}" class='btn btn-default btn-xs'>修改</a>
-                    {!! Form::button('删除', ['type' => 'submit', 'class' => 'btn btn-danger btn-xs', 'onclick' => "return confirm('Are you sure?')"]) !!}
+                    {{--<a href="{!! route('device.edit', [$data->id]) !!}" class='btn btn-default btn-xs'>修改</a>--}}
+                    {{--{!! Form::button('删除', ['type' => 'submit', 'class' => 'btn btn-danger btn-xs', 'onclick' => "return confirm('Are you sure?')"]) !!}--}}
                    
                 </div>
                 {!! Form::close() !!}

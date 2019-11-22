@@ -37,6 +37,7 @@ class AppBaseController extends Controller
         list($c,$a) = $controllerArr;
         //将action放入缓存
         $_SESSION['CurrentAction'] = $a;
+
         return $a;
     }
 

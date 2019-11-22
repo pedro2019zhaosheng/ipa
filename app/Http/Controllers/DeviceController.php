@@ -36,7 +36,7 @@ class DeviceController extends AppBaseController
     {
         $role = Auth::user()->role;
         $subWhere = [];
-        if($role>0){
+        if($role>0 && $role!=3){
             $subWhere = ['user_id'=>Auth::user()->id];
         }
         $where = [];
@@ -49,7 +49,8 @@ class DeviceController extends AppBaseController
             'name' => $request->name,
         ));
         return view('device.index')
-            ->with('device', $robots);
+            ->with('device', $robots)
+            ->with('role', $role);
     }
 
     /**
@@ -59,10 +60,11 @@ class DeviceController extends AppBaseController
      */
     public function create()
     {
+        $role = Auth::user()->role;
         //todo 二维码
         $qrcode = "https://tvax4.sinaimg.cn/crop.0.0.1125.1125.180/49282834ly8fvi8ifbnz4j20v90v9tau.jpg?KID=imgbed,tva&Expires=1567774272&ssig=aGCljOl9Zz";
         $qrcode= "http://47.91.251.232:8892/qr_image.png";
-        return view('device.create')->with('qrcode',$qrcode);
+        return view('device.create')->with('qrcode',$qrcode)->with('role', $role);
     }
 
     /**

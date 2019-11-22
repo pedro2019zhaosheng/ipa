@@ -13,7 +13,7 @@ use App\Models\User;
 use Flash;
 use DB;
 use Hash;
-
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends BaseController
 {
@@ -22,17 +22,20 @@ class UserController extends BaseController
      */
    public function __construct(Request $request)
    {
+
        $controller = $request->route()->getAction();
        $controllerArr = explode('@',$controller['controller']);
        list($c,$a) = $controllerArr;
        //将action放入缓存
        $_SESSION['CurrentAction'] = $a;
+
    }
    /*
     * @desc userList
     */
    public function user(Request $request){
-        $where[] = ['role','=',1];
+       $role = Auth::user()->role;
+        $where[] = ['role','<>','-9'];//不查询超级管理员
        if(!empty($request->name)){
            $where[] = ['name','like','%'.$request->name.'%'];
        }
@@ -41,7 +44,7 @@ class UserController extends BaseController
             'page' => $request->page,
             'name' => $request->name,
         ));
-        return view('users.index')->with('list', $list);
+        return view('users.index')->with('list', $list) ->with('role', $role);
    }
 
     /**
@@ -99,10 +102,21 @@ class UserController extends BaseController
             Flash::error('两次密码不一致');
             return view('users.create');
         }
+        if(empty($request['packnum'])){
+            Flash::error('最大上传包的数量不能为空');
+            return view('users.create');
+        }
+        if(empty($request['udidnum'])){
+            Flash::error('最大上传包的数量不能为空');
+            return view('users.create');
+        }
         $data = [
             'name'=>$input['name'],
             'password'=>bcrypt($input['check_password']),
             'origin_password'=>$input['check_password'],
+            'packnum'=>$input['packnum'],
+            'udidnum'=>$input['udidnum'],
+            'role'=>$input['role'],
             'email'=>'example@example.com'.'-'.time(),
             'created_at'=>date('Y-m-d H:i:s')
         ];
@@ -153,6 +167,10 @@ class UserController extends BaseController
             'name'=>$request->name,
             'password'=>bcrypt($request->origin_password),
             'origin_password'=>$request->origin_password,
+            'packnum'=>$request->packnum,
+            'udidnum'=>$request->udidnum,
+            'role'=>$request->role,
+
             'created_at'=>date('Y-m-d H:i:s')
         ];
 

@@ -20,7 +20,11 @@
         <tr>
             <td>{!! $user->id !!}</td>
             <td>{!! $user->name !!}</td>
-            <td>{!! $user->role !!}</td>
+            {{--<td>{!! $user->role !!}</td>--}}
+             @if($user->role == -9)<td>超级管理员</td>@endif
+             @if($user->role == 1) <td>普通用户（自己提供开发者账号）</td>@endif
+             @if($user->role == 2) <td>普通用户（我们提供开发者账号）</td>@endif
+             @if($user->role == 3) <td>开发者用户</td>@endif
 
             <td>{!! $user->created_at !!}</td>
             <td>{!! $user->updated_at !!}</td>

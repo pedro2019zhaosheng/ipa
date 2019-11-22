@@ -18,7 +18,10 @@
                     <li class="@if($_SESSION['CurrentAction']=='apple') active @endif"><a href="{{url('apple/apple')}}">苹果账号</a></li>
                     <li class="@if($_SESSION['CurrentAction']=='device') active @endif"><a href="{{url('device/device')}}">设备管理</a></li>
                     <li class="@if($_SESSION['CurrentAction']=='package') active @endif"><a href="{{url('package/package')}}">安装包管理</a></li>
-                    <li class="@if($_SESSION['CurrentAction']=='user') active @endif"><a href="{{url('user/user')}}">用户管理</a></li>
+                    @if($role < 0 || $role == 3)
+                        <li class="@if($_SESSION['CurrentAction']=='user') active @endif"><a href="{{url('user/user')}}">用户管理</a></li>
+                    @endif
+
                 </ul>
             </li>
            <!--  <li class="active treeview">

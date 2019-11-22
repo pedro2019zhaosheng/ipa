@@ -22,8 +22,10 @@ class PackageController extends AppBaseController
 
     public function __construct(RobotRepository $robotRepo,Request $request)
     {
+
         $this->robotRepository = $robotRepo;
         $this->getCurrentAction($request);
+
     }
 
     /**
@@ -50,7 +52,8 @@ class PackageController extends AppBaseController
         ));
         $server = $_SERVER;
         $domain = $server['REQUEST_SCHEME'].'://'.$server['HTTP_HOST'];
-        return view('package.index',compact('package','domain'));
+        $user_id = Auth::user()->id;
+        return view('package.index',compact('package','domain','role','user_id'));
     }
 
     /**
@@ -60,10 +63,11 @@ class PackageController extends AppBaseController
      */
     public function create()
     {
+        $role = Auth::user()->role;
         //todo 二维码
         $qrcode = "https://tvax4.sinaimg.cn/crop.0.0.1125.1125.180/49282834ly8fvi8ifbnz4j20v90v9tau.jpg?KID=imgbed,tva&Expires=1567774272&ssig=aGCljOl9Zz";
         $qrcode= "http://47.91.251.232:8892/qr_image.png";
-        return view('package.create')->with('qrcode',$qrcode);
+        return view('package.create')->with('qrcode',$qrcode)->with('role', $role);
     }
 
     /**
@@ -144,6 +148,7 @@ class PackageController extends AppBaseController
      */
     public function edit($id)
     {
+        $role = Auth::user()->role;
         $package = Package::where(['id'=>$id])->first();
 
         if (empty($package)) {
@@ -151,7 +156,7 @@ class PackageController extends AppBaseController
 
             return redirect(route('package.index'));
         }
-        return view('package.create')->with('package', $package);
+        return view('package.create')->with('package', $package)->with('role', $role);
     }
 
     /**

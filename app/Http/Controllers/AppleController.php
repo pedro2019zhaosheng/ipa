@@ -22,6 +22,7 @@ class AppleController extends AppBaseController
 
     public function __construct(RobotRepository $robotRepo,Request $request)
     {
+
         $this->robotRepository = $robotRepo;
         $this->getCurrentAction($request);
     }
@@ -36,7 +37,7 @@ class AppleController extends AppBaseController
     {
         $role = Auth::user()->role;
         $subWhere = [];
-        if($role>0){
+        if($role>0 && $role!=3){
             $subWhere = ['user_id'=>Auth::user()->id];
         }
 //        dump($request);die;
@@ -50,7 +51,9 @@ class AppleController extends AppBaseController
             'name' => $request->name,
         ));
         return view('apple.index')
-            ->with('apple', $robots);
+            ->with('apple', $robots)
+            ->with('role', $role)
+            ->with('user_id', Auth::user()->id);
     }
 
     /**
@@ -60,10 +63,11 @@ class AppleController extends AppBaseController
      */
     public function create()
     {
+        $role = Auth::user()->role;
         //todo 二维码
         $qrcode = "https://tvax4.sinaimg.cn/crop.0.0.1125.1125.180/49282834ly8fvi8ifbnz4j20v90v9tau.jpg?KID=imgbed,tva&Expires=1567774272&ssig=aGCljOl9Zz";
         $qrcode= "http://47.91.251.232:8892/qr_image.png";
-        return view('apple.create')->with('qrcode',$qrcode);
+        return view('apple.create')->with('qrcode',$qrcode) ->with('role', $role);
     }
 
     /**
@@ -122,6 +126,7 @@ class AppleController extends AppBaseController
      */
     public function show($id)
     {
+        $role = Auth::user()->role;
         $game = $this->robotRepository->findWithoutFail($id);
 
         if (empty($game)) {
@@ -129,7 +134,7 @@ class AppleController extends AppBaseController
             return redirect(route('robots.index'));
         }
 
-        return view('robots.show')->with('game', $game);
+        return view('robots.show')->with('game', $game)->with('role', $role);
     }
 
     /**
@@ -141,6 +146,7 @@ class AppleController extends AppBaseController
      */
     public function edit($id)
     {
+        $role = Auth::user()->role;
         $apple = Apple::where(['id'=>$id])->first();
 
         if (empty($apple)) {
@@ -148,7 +154,7 @@ class AppleController extends AppBaseController
 
             return redirect(route('apple.index'));
         }
-        return view('apple.create')->with('apple', $apple);
+        return view('apple.create')->with('apple', $apple)->with('role', $role);
     }
 
     /**

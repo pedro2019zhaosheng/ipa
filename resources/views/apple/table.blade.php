@@ -34,7 +34,7 @@
             <td>{!! $data->certificate_id !!}</td>
             <td>{!! $data->is_push==0?'否':'是' !!}</td>
             <td>{!! $data->created_at !!}</td>
-            
+            @if($data->user_id == $user_id || $role < 0)
             <td>
                 {!! Form::open(['route' => ['apple.destroy', $data->id], 'method' => 'get']) !!}
                 <div class='btn-group'>
@@ -45,6 +45,7 @@
                 {!! Form::close() !!}
 
             </td>
+            @endif
         </tr>
     @endforeach
 

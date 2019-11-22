@@ -21,6 +21,16 @@
                             {!! Form::text('password', null, ['class' => 'form-control']) !!}
                             {!! Form::label('check_password', '确认密码:') !!}
                             {!! Form::text('check_password', null, ['class' => 'form-control']) !!}
+
+                            {!! Form::label('packnum', '最大上传包的数量:') !!}
+                            {!! Form::text('packnum', null, ['class' => 'form-control']) !!}
+                            {!! Form::label('udidnum', '最大新增udid数量:') !!}
+                            {!! Form::text('udidnum', null, ['class' => 'form-control']) !!}
+                            {!! Form::label('usertype', '用户类型:') !!}
+                            {!! Form::radio('role', '1') !!} 普通用户（自己提供开发者账号）
+                            {!! Form::radio('role', '2') !!} 普通用户（我们提供开发者账号）
+                            {!! Form::radio('role', '3') !!} 开发者
+
                         </div>
 
 

@@ -1,5 +1,6 @@
 @extends('layouts.app')
-
+@include('adminlte-templates::common.errors')
+@include('flash::message')
 @section('content')
     <section class="content-header">
         <h1>
