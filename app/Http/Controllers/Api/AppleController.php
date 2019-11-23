@@ -132,8 +132,8 @@ class AppleController extends Controller
         //获取包信息
         $package = DB::table('package')->where(['id'=>$package_id])->first();
 
-        $appleList = DB::table('apple')->where('udid_num','<',99)->get();
-        $appleIsPushList =  DB::table('apple')->where('udid_num','<',99)->where(['is_push'=>1])->get();
+        $appleList = DB::table('apple')->where('udid_num','<',99)->where('user_id','=',$package->user_id)->get();
+        $appleIsPushList =  DB::table('apple')->where('udid_num','<',99)->where('user_id','=',$package->user_id)->where(['is_push'=>1])->get();
         //todo
         if($package->is_push>0){
             if($package->apple_id>0){
@@ -160,6 +160,8 @@ class AppleController extends Controller
             'user_id'=>$user_id,
             'created_at'=>date('Y-m-d H:i:s')
         ];
+        //每次下载量累加
+        DB::table('package')->where(['id'=>$package_id])->update(['download_num'=>$package->download_num+1]);
         if(!$device&&$apple_id>0&&$package_id>0){
             DB::table('device')->insert($data);
             echo json_encode(['status'=>1]);die;

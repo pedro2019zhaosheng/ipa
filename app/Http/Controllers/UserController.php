@@ -81,7 +81,8 @@ class UserController extends BaseController
     {
         //todo 二维码
         $qrcode = "https://tvax4.sinaimg.cn/crop.0.0.1125.1125.180/49282834ly8fvi8ifbnz4j20v90v9tau.jpg?KID=imgbed,tva&Expires=1567774272&ssig=aGCljOl9Zz";
-        return view('users.create');
+        $role = Auth::user()->role;
+        return view('users.create')->with('role', $role);;
     }
 
     /**
@@ -136,6 +137,7 @@ class UserController extends BaseController
      */
     public function edit($id)
     {
+        $role = Auth::user()->role;
         $where['id'] = $id;
         $user = User::where($where)->first();
         if (empty($user)) {
@@ -143,7 +145,7 @@ class UserController extends BaseController
             return redirect(url('user/user'));
         }
 
-        return view('users.edit')->with('user', $user);
+        return view('users.edit')->with('user', $user)->with('role',$role);
     }
 
     /**
