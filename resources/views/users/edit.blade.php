@@ -4,7 +4,7 @@
 @section('content')
     <section class="content-header">
         <h1>
-            更新机器人
+            更新账号信息
         </h1>
    </section>
    <div class="content">

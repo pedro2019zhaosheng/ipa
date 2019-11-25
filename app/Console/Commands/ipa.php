@@ -56,7 +56,9 @@ class ipa extends Command
                 if($package->is_push==1&&$package->apple_id!=$v->apple_id){
                     $buddle_id = $buddle_id.'.dfc_wx_'.$v->apple_id;
                 }
+                $packageName = $package->name?$package->name:$package->buddle_id;
             }
+
             //第一步根据苹果账号ID获取个人开发者账号信息
             //处理apple账号数量超过99
             $appleId = $v->apple_id;
@@ -116,7 +118,7 @@ class ipa extends Command
             }
             $outFour = [];//重新赋值
             //第四步生成ipa包
-            $stepFourCmd = "$cmdRoot sudo /bin/ruby signIpa.rb $account  $udid  $ipa_url $buddle_id $certificate_id /applesign/$account/$certificate_id/sign.$buddle_id.mobileprovision /applesign/$account/$certificate_id/client_key.pem /applesign/$account/$certificate_id/private_key.pem";
+            $stepFourCmd = "$cmdRoot sudo /bin/ruby signIpa.rb $account  $udid  $ipa_url $buddle_id $certificate_id /applesign/$account/$certificate_id/sign.$buddle_id.mobileprovision /applesign/$account/$certificate_id/client_key.pem /applesign/$account/$certificate_id/private_key.pem $packageName";
             exec($stepFourCmd,$outFour,$re);
             $plist = '';
             $ipa = '';
