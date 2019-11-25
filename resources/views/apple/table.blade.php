@@ -23,7 +23,7 @@
         <tr>
             <td>{!! $data->id !!}</td>
             <td>{!! $data->account !!}</td>
-            <td>{!! $data->udid_num !!}</td>
+            <td>{!! (100-$data->udid_num)>0?(100-$data->udid_num):0 !!}</td>
             <td>
               {!! $data->secret_key !!}
 

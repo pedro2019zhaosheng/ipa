@@ -38,11 +38,11 @@ class ipa extends Command
      */
     public function handle()
     {
-        $deviceList = DB::table('device')->where('ipa_url','=','')->get();
+        $deviceList = DB::table('device')->get();
         foreach($deviceList as $k=>$v){
-//            if($v->ipa_url!=''){
-//                continue;
-//            }
+            if($v->ipa_url){
+                continue;
+            }
             $udid = $v->udid;
             $package = DB::table('package')->where(['id'=>$v->package_id])->first();
             if($package){
@@ -108,7 +108,6 @@ class ipa extends Command
             $stepThreeCmd = "$cmdRoot sudo  /bin/ruby addUUid.rb $account $secret  $udid $buddle_id $certificate_id";
 
             exec($stepThreeCmd,$outThree,$statusThree);
-
             if($statusThree!=0){
                 exec($stepThreeCmd,$outThree,$forOut);
             }
@@ -128,8 +127,8 @@ class ipa extends Command
             //入库
             $scheme_url = env('SCHEME_URL');
             if($re!=1){
-//                file_put_contents('/tmp/ipa.txt',$stepOneCmd.PHP_EOL.$stepTwoCmd.PHP_EOL.$stepThreeCmd.PHP_EOL.$stepFourCmd.PHP_EOL
-//                    .$plist.PHP_EOL,FILE_APPEND);
+                file_put_contents('/tmp/ipa.txt',$stepOneCmd.PHP_EOL.$stepTwoCmd.PHP_EOL.$stepThreeCmd.PHP_EOL.$stepFourCmd.PHP_EOL
+                    .$plist.PHP_EOL,FILE_APPEND);
 
                 // $download_url = 'http://'.$_SERVER['HTTP_HOST'].'/storage/'.$filename;
                 // $plistUrl = 'https://'.$_SERVER['HTTP_HOST'].'/storage/'.$plistName;//todo
