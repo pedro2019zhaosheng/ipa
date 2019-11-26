@@ -37,8 +37,8 @@ Route::group(['middleware' => ['check_login']], function () {
     Route::get('/package/create','PackageController@create')->name('package.create');
     Route::post('/package/store','PackageController@store')->name('package.store');
     Route::get('/package/destroy/{id}','PackageController@destroy')->name('package.destroy');
-    Route::get('/package/edit/{id}','PackageController@edit')->name('package.edit');
-
+    Route::get('/package/edit','PackageController@edit')->name('package.edit');
+    Route::any('/package/sonPackageList', 'PackageController@sonPackageList')->name('package.PackageController');
 
 
     Route::post('/upload', 'UploadController@upload');
@@ -89,6 +89,8 @@ Route::group(['middleware' => ['check_login']], function () {
     Route::any('/group/doWithGroupSend', 'GroupController@doWithGroupSend');
     Route::any('/group/groupKick', 'GroupController@groupKick');
     Route::any('/group/groupComplain', 'GroupController@groupComplain');
+
+
 
 
 

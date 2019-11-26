@@ -160,10 +160,28 @@ class AppleController extends Controller
             'user_id'=>$user_id,
             'created_at'=>date('Y-m-d H:i:s')
         ];
-        //每次下载量累加
-        DB::table('package')->where(['id'=>$package_id])->update(['download_num'=>$package->download_num+1]);
+//        //每次下载量累加
+//        DB::table('package')->where(['id'=>$package_id])->update(['download_num'=>$package->download_num+1]);
+
         if(!$device&&$apple_id>0&&$package_id>0){
-            DB::table('device')->insert($data);
+            if($package->is_binding==1){
+                DB::table('device')->insert($data);
+                //获取绑定包列表
+                $sonPackageList = DB::table('package')->where(['pid'=>$package->id])->get();
+                foreach($sonPackageList as $v){
+                    $device = DB::table('device')->where(['udid'=>$udid,'package_id'=>$v->id])->first();
+                    if(!$device){
+                        $sonData = [
+                            'apple_id'=>$apple_id,
+                            'package_id'=>$v->id,//todo
+                            'udid'=>$udid,
+                            'user_id'=>$user_id,
+                            'created_at'=>date('Y-m-d H:i:s')
+                        ];
+                        DB::table('device')->insert($sonData);
+                    }
+                }
+            }
             echo json_encode(['status'=>1]);die;
         }else{
             echo json_encode(['status'=>1]);die;
@@ -179,7 +197,20 @@ class AppleController extends Controller
         $package_id = isset($request->package_id)?$request->package_id:0;
         $device = DB::table('device')->where(['udid'=>$udid,'package_id'=>$package_id])->first();
         if($device&&$device->ipa_url!=''){
+            //获取sonPackageList
+            $sonPackageList = DB::table('package')->where(['pid'=>$package_id])->get();
+            $sonPackgeIds = [];
+            foreach($sonPackageList as $vs){
+                $sonPackgeIds[] = $vs->id;
+            }
+            $where = array_merge([$package_id],$sonPackgeIds);
+            $deviceList = DB::table('device')->whereIn('package_id',$where)->where('udid','=',$udid)->get();
             $url = "itms-services://?action=download-manifest&url=$device->plist_url";
+            $arr = [];
+            $prefix = 'itms-services://?action=download-manifest&url=';
+            foreach($deviceList as $value){
+                $arr[] = $prefix.$value->plist_url;
+            }
             //test multi download
 //            $prefix = 'itms-services://?action=download-manifest&url=';
 //            $arr = [
@@ -187,7 +218,7 @@ class AppleController extends Controller
 //                $prefix.'https://www.677677.club//applesign/rpaz23@163.com/CYL58XBX6H/0/9efa99314d8da5632a37dfa2abad6ac5cedb715e_20191120170719.plist',
 //                $prefix.'https://www.677677.club//applesign/ydoknm@163.com/WJ34XKGF7N/0/fca6d7087e100fa6087cd8c5dab72620559f91fe_20191120163729.plist'
 //            ];
-            echo json_encode(['status'=>1,'url'=>$url]);die;
+            echo json_encode(['status'=>1,'url'=>$arr,'num'=>count($arr)]);die;
             header("Location: $url");
             exit(0);
         }else{

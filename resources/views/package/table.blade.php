@@ -58,7 +58,7 @@
             <td>
                 {!! Form::open(['route' => ['package.destroy', $data->id], 'method' => 'get']) !!}
                 <div class='btn-group'>
-                    <a href="{!! route('package.edit', [$data->id]) !!}" class='btn btn-default btn-xs'>修改</a>
+                    <a href="{!! url('package/edit?id='.$data->id) !!}" class='btn btn-default btn-xs'>修改</a>
                     {!! Form::button('删除', ['type' => 'submit', 'class' => 'btn btn-danger btn-xs', 'onclick' => "return confirm('Are you sure?')"]) !!}
                    
                 </div>

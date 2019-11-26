@@ -43,8 +43,11 @@
                     {!! Form::open(['route' => 'package.store','files' => true]) !!}
                 <input type='hidden' name='id' value="{{isset($package->id)?$package->id:0}}">
                 <input type='hidden' name='ipa_url' value="{{isset($package->ipa_url)?$package->ipa_url:''}}">  
-                <input type='hidden' name='icon_url' value="{{isset($package->icon)?$package->icon:''}}">  
-{{--                    @include('robots.fields')--}}
+                <input type='hidden' name='icon_url' value="{{isset($package->icon)?$package->icon:''}}">
+                    <input type='hidden' name='package_id' value="{{isset($request->package_id)?$request->package_id:''}}">
+
+                    <input type='hidden' name='type' value="{{isset($request->type)?$request->type:0}}">
+                    {{--                    @include('robots.fields')--}}
                          <div class="form-group col-sm-12">
                             {!! Form::label('account', 'BuddleId:') !!}
                             {!! Form::text('buddle_id', isset($package->buddle_id)?$package->buddle_id:'' , ['class' => 'form-control']) !!}
@@ -53,14 +56,20 @@
                             {!! Form::label('account', '简介:') !!}
                             {!! Form::text('introduction', isset($package->introduction)?$package->introduction:'' , ['class' => 'form-control']) !!}
                         </div>
-                    <div class="checkbox-inline">
+                    <div class="form-group col-sm-12">
                         {!! Form::label('status', '是否推送:') !!}
                         {!! Form::radio('is_push', '1', isset($package->is_push)&&$package->is_push==1?true:false) !!} 开启
                         {!! Form::radio('is_push', '0', isset($package->is_push)&&$package->is_push==0?true:false) !!} 关闭
 
                     </div>
                     <div class="form-group col-sm-12">
-                        {!! Form::label('apple_id', '苹果账号ID:') !!}
+                        {!! Form::label('is_binding', '是否自动打包捆绑包:') !!}
+                        {!! Form::radio('is_binding', '1', isset($package->is_binding)&&$package->is_binding==1?true:false) !!} 开启
+                        {!! Form::radio('is_binding', '0', isset($package->is_binding)&&$package->is_binding==0?true:false) !!} 关闭
+
+                    </div>
+                    <div class="form-group col-sm-12">
+                        {!! Form::label('apple_id', '第一次打包苹果账号ID:') !!}
                         {!! Form::text('apple_id', isset($package->apple_id)?$package->apple_id:'' , ['class' => 'form-control']) !!}
                     </div>
                 </div>

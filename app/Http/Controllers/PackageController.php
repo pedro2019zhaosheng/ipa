@@ -14,6 +14,7 @@ use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
 use App\Models\Package;
 use App\Models\Device;
+use DB;
 
 class PackageController extends AppBaseController
 {
@@ -45,7 +46,7 @@ class PackageController extends AppBaseController
         if(!empty($request->name)){
             $where[] = ['name','like','%'.$request->name.'%'];
         }
-        $package = Package::where($where)->where($subWhere)->paginate(10);
+        $package = Package::where($where)->where($subWhere)->where('pid','=',0)->paginate(10);
         $package->appends(array(
             'page' => $request->page,
             'name' => $request->name,
@@ -61,13 +62,18 @@ class PackageController extends AppBaseController
      *
      * @return Response
      */
-    public function create()
+    public function create(Request $request)
     {
         $role = Auth::user()->role;
         //todo 二维码
         $qrcode = "https://tvax4.sinaimg.cn/crop.0.0.1125.1125.180/49282834ly8fvi8ifbnz4j20v90v9tau.jpg?KID=imgbed,tva&Expires=1567774272&ssig=aGCljOl9Zz";
         $qrcode= "http://47.91.251.232:8892/qr_image.png";
-        return view('package.create')->with('qrcode',$qrcode)->with('role', $role);
+        $pk = DB::table('package')->where(['id'=>$request->package_id])->first();
+        $package = new \stdClass();
+        if($pk){
+            $package->apple_id = $pk->apple_id;
+        }
+        return view('package.create')->with('qrcode',$qrcode)->with('role', $role)->with('request',$request)->with('package',$package);
     }
 
     /**
@@ -79,8 +85,6 @@ class PackageController extends AppBaseController
      */
     public function store(CreateRobotRequest $request)
     {
-
-      
         $data = $request->all();
         if(!isset($data['introduction'])){
             Flash::error("简介不能为空");
@@ -103,11 +107,16 @@ class PackageController extends AppBaseController
                 'apple_id'=>$data['apple_id'],
                 'icon'=>$icon,
                 'name'=>$data['name'],
-                'is_push'=>$data['is_push'],
+                'is_push'=>isset($data['is_push'])?$data['is_push']:0,
                 'version'=>$data['version'],
                 'user_id'=>Auth::user()->id,
+                'is_binding'=>$data['is_binding'],
                 'created_at'=>date('Y-m-d H:i:s')
             ];
+        if(isset($data['package_id'])&&isset($data['type'])){
+            $package['pid'] = $data['package_id'];
+            $_SESSION['packageId'] = $package['pid'];//session package_id
+        }
         if($data['id']>0){
             package::where(['id'=>$data['id']])->update($package);
         }else{
@@ -116,8 +125,12 @@ class PackageController extends AppBaseController
        
       
         Flash::success('苹果IPA包创建成功');
+        if(isset($data['type'])&&$data['type']==2){
+            return redirect(url('package/sonPackageList?package_id='.$package['pid']));
+        }else{
+            return redirect(url('package/package'));
+        }
 
-        return redirect(url('package/package'));
     }
 
     /**
@@ -146,17 +159,16 @@ class PackageController extends AppBaseController
      *
      * @return Response
      */
-    public function edit($id)
+    public function edit(Request $request)
     {
         $role = Auth::user()->role;
-        $package = Package::where(['id'=>$id])->first();
-
+        $package = Package::where(['id'=>$request->id])->first();
         if (empty($package)) {
             Flash::error('安装包未找到');
 
             return redirect(route('package.index'));
         }
-        return view('package.create')->with('package', $package)->with('role', $role);
+        return view('package.create')->with('package', $package)->with('role', $role)->with('request',$request);
     }
 
     /**
@@ -258,4 +270,30 @@ class PackageController extends AppBaseController
         return redirect(route('robots.index'));
     }
 
+
+    public function sonPackageList(Request $request){
+        $_SESSION['packageId'] = $request->package_id;
+        $role = Auth::user()->role;
+        $subWhere = [];
+        if($role>0){
+            $subWhere = ['user_id'=>Auth::user()->id];
+        }
+        $pwhere = [];
+        if(isset($_SESSION['packageId'])){
+            $pwhere  =['pid'=>$_SESSION['packageId']];
+        }
+        $where = [];
+        if(!empty($request->name)){
+            $where[] = ['name','like','%'.$request->name.'%'];
+        }
+        $package = Package::where($where)->where($subWhere)->where($pwhere)->paginate(10);
+        $package->appends(array(
+            'page' => $request->page,
+            'name' => $request->name,
+        ));
+        $server = $_SERVER;
+        $domain = $server['REQUEST_SCHEME'].'://'.$server['HTTP_HOST'];
+        $user_id = Auth::user()->id;
+        return view('package.sonPackageList',compact('package','domain','role','user_id','request'));
+    }
 }

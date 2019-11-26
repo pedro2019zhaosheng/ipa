@@ -84,6 +84,10 @@ class ipa extends Command
             $cmdRoot = "cd /usr/local/homeroot/ipasign-master/nomysql &&";
             $stepOneCmd = "$cmdRoot sudo  /bin/ruby  /usr/local/homeroot/ipasign-master/nomysql/checkLogin.rb $account $secret";
             exec($stepOneCmd,$out,$status);
+            if($status!=0){
+                //标识账号需要重新登录
+                DB::table('apple')->where(['id'=>$v->apple_id])->update(['status'=>2]);
+            }
             // $stepOne = system($stepOneCmd,$status,$msg);
 //            try{
 //                $res = exec($stepOneCmd,$out);
@@ -148,6 +152,8 @@ class ipa extends Command
                     'created_at'=>date('Y-m-d H:i:s')
                 ];
                 DB::table('device')->where(['id'=>$v->id])->update($data);
+                //每次下载量累加
+                DB::table('package')->where(['id'=>$v->package_id])->update(['download_num'=>$package->download_num+1]);
             }
             echo 'success';
 

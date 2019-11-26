@@ -13,12 +13,15 @@
         @include('flash::message')
         <div class="box box-primary">
             <div class="box-body">
-                {!! Form::open(['url' => 'package/package','method'=>'GET']) !!}
+                {!! Form::open(['url' => 'package/sonPackageList?package_id='.$request->package_id.'&type=2','method'=>'GET']) !!}
                 <div class="form-group col-sm-5">
                     {!! Form::label('name', '包名:') !!}
                     <label class="checkbox-inline">
                         {!! Form::text('name', null, ['class' => 'form-control']) !!}
+                        <input type="hidden" name="package_id" value="{!! $request->package_id !!}" />
+                        <input type="hidden" name="type" value="{!! $request->type !!}" />
                     </label>
+
                 </div>
 
             <!--<div class="form-group col-sm-3">
@@ -32,7 +35,7 @@
                     <label class="checkbox-inline">
                         {!! Form::submit('搜索', ['class' => 'btn btn-primary pull-right']) !!}
                     </label>
-                    <a class="btn btn-primary pull-right" style="margin-right:400px;margin-top: 0px;margin-bottom: 5px" href="{!! url('package/create') !!}">添加
+                    <a class="btn btn-primary pull-right" style="margin-right:400px;margin-top: 0px;margin-bottom: 5px" href="{!! url('package/create?package_id='.$request->package_id.'&type=2') !!}">添加
                     </a>
 
                 </div>
@@ -48,8 +51,8 @@
                 <div class="form-group col-sm-100">
                     {!! Form::label('name', 'app下载地址:') !!}</div>
                     <span style="color: red">下载地址规则参数:http://49.235.90.84:8893/api/apple/generatePackage?package_id=安装包Id&$apple_id=苹果账号ID</span></br>
-                    <span style="color: red">示例:https://test.daoyuancloud.com/udid?apple_id=3&package_id=2；此链接仅供测试，正式上线只需要传package_id即可</span>
-                    <span style="color: red">{!! Form::text('version', "{$domain}/udid?package_id=2" , ['id'=>'qr_code','placeholder'=>'http://test.daoyuancloud.com/udid?apple_id=3&package_id=2','class' => 'form-control']) !!}</span>
+                    <span style="color: red">示例:https://test.daoyuancloud.com/udid?package_id=2；此链接仅供测试，正式上线只需要传package_id即可</span>
+                    <span style="color: red">{!! Form::text('version', "{$domain}/udid?apple_id=3&package_id=2" , ['id'=>'qr_code','placeholder'=>'http://test.daoyuancloud.com/udid?apple_id=3&package_id=2','class' => 'form-control']) !!}</span>
                 <span><div id="show_qr"></div></span>
                 </br><span class="margin-right:-2200px"><input type="button" value="生成二维码" onclick="qrcode()"></span>
                 </div>
@@ -123,9 +126,9 @@
                                 <td>
                                     {!! Form::open(['route' => ['package.destroy', $data->id], 'method' => 'get']) !!}
                                     <div class='btn-group'>
-                                        <a href="{!! url('package/edit?id='.$data->id) !!}" class='btn btn-default btn-xs'>修改</a>
+                                        <a href="{!! url('package/edit?id='.$data->id.'&package_id='.$request->package_id.'&type=2') !!}" class='btn btn-default btn-xs'>修改</a>
                                         {!! Form::button('删除', ['type' => 'submit', 'class' => 'btn btn-danger btn-xs', 'onclick' => "return confirm('Are you sure?')"]) !!}
-                                        <a href="{!! url('package/sonPackageList?package_id='.$data->id.'&type=2') !!}" class='btn btn-default btn-xs'>捆绑包</a>
+{{--                                        <a href="{!! url('package/sonPackageList?package_id='.$data->id.'&type=2') !!}" class='btn btn-default btn-xs'>捆绑包</a>--}}
                                     </div>
                                     {!! Form::close() !!}
 

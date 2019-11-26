@@ -7,6 +7,7 @@
     <thead>
         <tr>
         <th>ID</th>
+        <th>账号在服务端是否过期</th>
         <th>Apple开发者账号</th>
         <th>剩余设备数量</th>
         <th>P8密钥</th>
@@ -22,6 +23,7 @@
     @foreach($apple as $data)
         <tr>
             <td>{!! $data->id !!}</td>
+            <td><span style="color:red">{!! $data->status==2?'已过期':'未过期' !!}</span></td>
             <td>{!! $data->account !!}</td>
             <td>{!! (100-$data->udid_num)>0?(100-$data->udid_num):0 !!}</td>
             <td>
