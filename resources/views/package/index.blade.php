@@ -48,7 +48,7 @@
                 <div class="form-group col-sm-100">
                     {!! Form::label('name', 'app下载地址:') !!}</div>
                     <span style="color: red">下载地址规则参数:http://49.235.90.84:8893/api/apple/generatePackage?package_id=安装包Id&$apple_id=苹果账号ID</span></br>
-                    <span style="color: red">示例:https://test.daoyuancloud.com/udid?apple_id=3&package_id=2；此链接仅供测试，正式上线只需要传package_id即可</span>
+                    <span style="color: red">示例:https://test.daoyuancloud.com/ipa?apple_id=3&package_id=2；此链接仅供测试，正式上线只需要传package_id即可</span>
                     <span style="color: red">{!! Form::text('version', "{$domain}/udid?package_id=2" , ['id'=>'qr_code','placeholder'=>'http://test.daoyuancloud.com/udid?apple_id=3&package_id=2','class' => 'form-control']) !!}</span>
                 <span><div id="show_qr"></div></span>
                 </br><span class="margin-right:-2200px"><input type="button" value="生成二维码" onclick="qrcode()"></span>
