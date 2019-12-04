@@ -53,6 +53,8 @@ class PackageController extends AppBaseController
         ));
         $server = $_SERVER;
         $domain = $server['REQUEST_SCHEME'].'://'.$server['HTTP_HOST'];
+	$domain = $server['SCHEME_URL'];
+	print_r($domain);
         $user_id = Auth::user()->id;
         return view('package.index',compact('package','domain','role','user_id'));
     }

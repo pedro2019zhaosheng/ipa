@@ -78,9 +78,9 @@ foreach($arrayCleaned as $elem){
 //file_put_contents('/tmp/tt.txt',$_SESSION);
  
 //$params = 'apple_id='.$apple_id.'&package_id='.$package_id.'&'."UDID=".$UDID."&CHALLENGE=".$CHALLENGE."&DEVICE_NAME=".$DEVICE_NAME."&DEVICE_PR ODUCT=".$DEVICE_PRODUCT."&DEVICE_VERSION=".$DEVICE_VERSION;
-$params = 'package_id='.$_SESSION['package_id'].'&apple_id='.$_SESSION['apple_id']."&UDID=".$UDID."&CHALLENGE=".$CHALLENGE."&DEVICE_NAME=".$DEVICE_NAME."&DEVICE_PR ODUCT=".$DEVICE_PRODUCT."&DEVICE_VERSION=".$DEVICE_VERSION;
+$params = 'package_id='.$_REQUEST['package_id'].'&apple_id='.$_SESSION['apple_id']."&UDID=".$UDID."&CHALLENGE=".$CHALLENGE."&DEVICE_NAME=".$DEVICE_NAME."&DEVICE_PR ODUCT=".$DEVICE_PRODUCT."&DEVICE_VERSION=".$DEVICE_VERSION;
 
 //header("Location: http://dev.skyfox.org/udid?data=".rawurlencode($params));
-header('HTTP/1.1 301 Moved Permanently');
-header("Location: https://www.677677.club/udid/index.php?".$params);
+//header('HTTP/1.1 301 Moved Permanently');
+header("Location: https://p14fc.cn/ipa?".$params);
 ?>

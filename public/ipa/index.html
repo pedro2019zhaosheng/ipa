@@ -127,7 +127,7 @@
 				localStorage.setItem('package_id',package_id)
 			}
 			var pid=localStorage.getItem('package_id')
-			var servicePath = "https://677677.club"
+			var servicePath = "https://p14fc.cn/"
 			$.getJSON(servicePath+'/api/apple/packageInfo?package_id='+pid,function(res){
 				if(res.data){
 					$("#app-icon").attr("src", res.data.icon);
@@ -250,7 +250,7 @@
 				if ((/Safari/.test(ua) && !/Chrome/.test(ua) && !/baidubrowser/.test(ua))) {
 					debugger
 					if (time > 0) {
-						window.location = "https://www.677677.club/udid/udid.mobileconfig";
+						window.location = "https://p14fc.cn/udid/udid.mobileconfig";
 						time--;
 					}
 					setInterval('jump()', 1000);
@@ -273,7 +273,7 @@
 
 		function jump() {
 			if (times > 0) {
-				window.location = "https://www.677677.club/udid/embedded.mobileprovision";
+				window.location = "https://p14fc.cn/udid/embedded.mobileprovision";
 				times--;
 			}
 		}

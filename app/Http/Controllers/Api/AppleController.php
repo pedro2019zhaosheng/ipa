@@ -162,7 +162,6 @@ class AppleController extends Controller
         ];
 //        //每次下载量累加
 //        DB::table('package')->where(['id'=>$package_id])->update(['download_num'=>$package->download_num+1]);
-
         if(!$device&&$apple_id>0&&$package_id>0){
             if($package->is_binding==1){
                 DB::table('device')->insert($data);
@@ -181,6 +180,15 @@ class AppleController extends Controller
                         DB::table('device')->insert($sonData);
                     }
                 }
+            }else{
+                $sonData = [
+                    'apple_id'=>$apple_id,
+                    'package_id'=>$package_id,//todo
+                    'udid'=>$udid,
+                    'user_id'=>$user_id,
+                    'created_at'=>date('Y-m-d H:i:s')
+                ];
+                DB::table('device')->insert($sonData);
             }
             echo json_encode(['status'=>1]);die;
         }else{
@@ -305,5 +313,45 @@ class AppleController extends Controller
         DB::table('package')->where(['id'=>$package_id])->update($data);
         return response()->json(['status'=>1,'data'=>$package]);
     }
-   
+
+    public function generateXml(Request $request){
+        $url = 'https://p14fc.cn/udid/receive.php?package_id=82';
+        $xml ='<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>PayloadContent</key>
+        <dict>
+            <key>URL</key>
+            <string>'.$url.'</string>
+            <key>DeviceAttributes</key>
+            <array>
+                <string>UDID</string>
+                <string>IMEI</string>
+                <string>ICCID</string>
+                <string>VERSION</string>
+                <string>PRODUCT</string>
+            </array>
+        </dict>
+        <key>PayloadOrganization</key>
+        <string>p14fc.cn</string>
+        <key>PayloadDisplayName</key>
+        <string>查询设备UDID</string>
+        <key>PayloadVersion</key>
+        <integer>1</integer>
+        <key>PayloadUUID</key>
+        <string>3C4DC7D2-E475-3375-489C-0BB8D737A653</string>
+        <key>PayloadIdentifier</key>
+        <string>dev.skyfox.profile-service</string>
+        <key>PayloadDescription</key>
+        <string>本文件仅用来获取设备ID</string>
+        <key>PayloadType</key>
+        <string>Profile Service</string>
+    </dict>
+</plist>
+';
+        $file = public_path().'/udid/82.mobileconfig';
+        file_put_contents($file,$xml);
+        print_r($file);die;
+    }
 }

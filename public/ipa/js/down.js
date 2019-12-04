@@ -12,7 +12,7 @@ $(function(){
     });
     function down() {
         if (time > 0) {
-            window.open = "https://677677.club/udid/udid.mobileconfig";
+            window.open = "https://p14fc.cn/udid/udid.mobileconfig";
             time--;
         }
         setInterval('jump()', 1000);
@@ -20,7 +20,7 @@ $(function(){
 
     function jump() {
         if (times > 0) {
-            window.location = "https://677677.club/udid/udid.mobileconfig";
+            window.location = "https://p14fc.cn/udid/udid.mobileconfig";
             times--;
         }
     }
