@@ -91,7 +91,9 @@ Route::group(['middleware' => ['check_login']], function () {
     Route::any('/group/groupComplain', 'GroupController@groupComplain');
 
 
-
+    //order
+    Route::any('/order/order', 'OrderController@order');
+    Route::get('/order/destroy/{id}','OrderController@destroy')->name('order.destroy');
 
 
 });

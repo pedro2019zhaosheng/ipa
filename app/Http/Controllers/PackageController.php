@@ -52,7 +52,7 @@ class PackageController extends AppBaseController
             'name' => $request->name,
         ));
         $server = $_SERVER;
-        $domain = $server['REQUEST_SCHEME'].'://'.$server['HTTP_HOST'];
+//        $domain = $server['REQUEST_SCHEME'].'://'.$server['HTTP_HOST'];
 	$domain = $server['SCHEME_URL'];
 	print_r($domain);
         $user_id = Auth::user()->id;
@@ -115,14 +115,107 @@ class PackageController extends AppBaseController
                 'is_binding'=>$data['is_binding'],
                 'created_at'=>date('Y-m-d H:i:s')
             ];
+        if(Auth::user()->role<0){
+            unset($package['user_id']);
+        }
         if(isset($data['package_id'])&&isset($data['type'])){
             $package['pid'] = $data['package_id'];
             $_SESSION['packageId'] = $package['pid'];//session package_id
         }
         if($data['id']>0){
+            $id = $data['id'];
+            //生成mobileconfig
+            $url = 'https://p14fc.cn/udid/receive.php?package_id='.$id;
+            $xml ='<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>PayloadContent</key>
+        <dict>
+            <key>URL</key>
+            <string>'.$url.'</string>
+            <key>DeviceAttributes</key>
+            <array>
+                <string>UDID</string>
+                <string>IMEI</string>
+                <string>ICCID</string>
+                <string>VERSION</string>
+                <string>PRODUCT</string>
+            </array>
+        </dict>
+        <key>PayloadOrganization</key>
+        <string>授权安装APP进入下一步</string>
+        <key>PayloadDisplayName</key>
+        <string>'.$package['name'].'</string>
+        <key>PayloadVersion</key>
+        <integer>1</integer>
+        <key>PayloadUUID</key>
+        <string>3C4DC7D2-E475-3375-489C-0BB8D737A653</string>
+        <key>PayloadIdentifier</key>
+        <string>dev.skyfox.profile-service</string>
+        <key>PayloadDescription</key>
+        <string>本文件仅用来获取设备ID</string>
+        <key>PayloadType</key>
+        <string>Profile Service</string>
+    </dict>
+</plist>
+';
+            $file = public_path().'/udid/'.$id.'.sign.mobileconfig';
+            file_put_contents($file,$xml);
+            $cmdRoot = "sudo su && cd /usr/local/homeroot/ipasign-master/nomysql &&";
+            $cmd = "$cmdRoot   /usr/local/ruby-2.6.4/bin/ruby signMobileConfig.rb $file $id";
+            @exec($cmd,$out,$status);
+
             package::where(['id'=>$data['id']])->update($package);
+            //删除sign.mobileconfig
+            exec("sudo rm -rf $file");
         }else{
             Package::insert($package);
+            $id = DB::getPdo()->lastInsertId();
+            //生成mobileconfig
+            $url = 'https://p14fc.cn/udid/receive.php?package_id='.$id;
+            $xml ='<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>PayloadContent</key>
+        <dict>
+            <key>URL</key>
+            <string>'.$url.'</string>
+            <key>DeviceAttributes</key>
+            <array>
+                <string>UDID</string>
+                <string>IMEI</string>
+                <string>ICCID</string>
+                <string>VERSION</string>
+                <string>PRODUCT</string>
+            </array>
+        </dict>
+        <key>PayloadOrganization</key>
+        <string>授权安装APP进入下一步</string>
+        <key>PayloadDisplayName</key>
+        <string>'.$package['name'].'</string>
+        <key>PayloadVersion</key>
+        <integer>1</integer>
+        <key>PayloadUUID</key>
+        <string>3C4DC7D2-E475-3375-489C-0BB8D737A653</string>
+        <key>PayloadIdentifier</key>
+        <string>dev.skyfox.profile-service</string>
+        <key>PayloadDescription</key>
+        <string>本文件仅用来获取设备ID</string>
+        <key>PayloadType</key>
+        <string>Profile Service</string>
+    </dict>
+</plist>
+';
+            $file = public_path().'/udid/'.$id.'.sign.mobileconfig';
+            file_put_contents($file,$xml);
+            $cmdRoot = "sudo su && cd /usr/local/homeroot/ipasign-master/nomysql &&";
+            $cmd = "$cmdRoot   /usr/local/ruby-2.6.4/bin/ruby signMobileConfig.rb $file $id";
+            @exec($cmd,$out,$status);
+            sleep(2);
+            //删除sign.mobileconfig
+            exec("sudo rm -rf $file");
         }
        
       

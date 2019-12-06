@@ -5,7 +5,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0" name="viewport">
-	<title>赚惠宝</title>
+	<title>超级签</title>
 	<link href="css/app.css" rel="stylesheet">
 	<link href="css/web_ios.css" rel="stylesheet">
 	<link href="js/zy.media.min.css" rel="stylesheet">
@@ -129,13 +129,13 @@
 			var pid=localStorage.getItem('package_id')
 			var servicePath = "https://p14fc.cn/"
 			$.getJSON(servicePath+'/api/apple/packageInfo?package_id='+pid,function(res){
-				if(res.data){
+				if(res.status==1){
 					$("#app-icon").attr("src", res.data.icon);
 					$("#apple_title").text(res.data.name);
 					$("#introInfo").text(res.data.introduction)
 					$("#app-size").text(res.data.size)
 				}else{
-					alert("该APP不存在")
+					alert(res.message);
 				}
 			})
 			$.getJSON(servicePath + "/udid?package_id=" + package_id, function (result) {

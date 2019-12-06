@@ -112,8 +112,8 @@ class ipa extends Command
             }
             //第三步将udid写入开发者账号
             $stepThreeCmd = "$cmdRoot sudo  /bin/ruby addUUid.rb $account $secret  $udid $buddle_id $certificate_id";
-
             exec($stepThreeCmd,$outThree,$statusThree);
+
             if($statusThree!=0){
                 exec($stepThreeCmd,$outThree,$forOut);
             }

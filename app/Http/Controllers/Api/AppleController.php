@@ -128,9 +128,29 @@ class AppleController extends Controller
             echo json_encode(['status'=>0,'message'=>'缺少参数！','data'=>[]]);die;
         }
         $package_id = isset($request->package_id)?$request->package_id:0;
-        $device = DB::table('device')->where(['udid'=>$udid,'package_id'=>$package_id])->first();
         //获取包信息
         $package = DB::table('package')->where(['id'=>$package_id])->first();
+        if($package->user_id<1){
+            fail('无效的包！');
+        }
+        //找出上传包的用户信息
+        $user = DB::table('users')->where(['id'=>$package->user_id])->first();
+        if($package->is_super==1){
+            if($user->download_package_num<1){
+                fail('下载次数不足，请充值！');
+            }else{
+                success();
+            }
+        }
+        if($package->is_super==2){
+            if($user->sign_num<1){
+                fail('签名次数不足，请充值！');
+            }
+        }
+
+
+        $device = DB::table('device')->where(['udid'=>$udid,'package_id'=>$package_id])->first();
+
 
         $appleList = DB::table('apple')->where('udid_num','<',99)->where('user_id','=',$package->user_id)->get();
         $appleIsPushList =  DB::table('apple')->where('udid_num','<',99)->where('user_id','=',$package->user_id)->where(['is_push'=>1])->get();
@@ -199,9 +219,69 @@ class AppleController extends Controller
 
     public function ipa(Request $request){
         $udid = isset($request->udid)?$request->udid:0;
+
+        $package_id = isset($request->package_id)?$request->package_id:0;
+        //获取包信息
+        $package = DB::table('package')->where(['id'=>$package_id])->first();
+        if($package->user_id<1){
+            fail('无效的包！');
+        }
+        //找出上传包的用户信息
+        $user = DB::table('users')->where(['id'=>$package->user_id])->first();
+        if($package->is_super==1){
+            if($user->download_package_num<1){
+                fail('下载次数不足，请充值！');
+            }else{
+                $prefix = 'itms-services://?action=download-manifest&url=';
+                $plist = '<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>items</key>
+        <array>
+                <dict>
+                        <key>assets</key>
+                        <array>
+                                <dict>
+                                        <key>kind</key>
+                                        <string>software-package</string>
+                                        <key>url</key>
+                                        <string>'.$package->ipa_url.'</string>
+                                </dict>
+                        </array>
+                        <key>metadata</key>
+                        <dict>
+                                <key>bundle-identifier</key>
+                                <string>com.text.WWW.WeChatTiaoT.01</string>
+                                <key>bundle-version</key>
+                                <string>1.0</string>
+                                <key>kind</key>
+                                <string>software</string>
+                                <key>title</key>
+                                <string>WBF-Exchange</string>
+                        </dict>
+                </dict>
+        </array>
+</dict>
+</plist>
+';
+                $file = public_path().'/udid/'.$package_id.'.plist';
+                file_put_contents($file,$plist);
+                $ipa_url = $_SERVER['SCHEME_URL'].'/udid/'.$package_id.'.plist';
+                $arr[] = $prefix.$ipa_url;
+                DB::table('users')->where(['id'=>$user->id])->update(['download_package_num'=>$user->download_package_num-1]);
+                echo json_encode(['status'=>1,'url'=>$arr,'num'=>count($arr)]);die;
+            }
+        }
+        if($package->is_super==2){
+            if($user->sign_num<1){
+                fail('签名次数不足，请充值！');
+            }
+        }
         if(!$udid){
             echo json_encode(['status'=>0,'message'=>'缺少参数！','data'=>[]]);die;
         }
+
         $package_id = isset($request->package_id)?$request->package_id:0;
         $device = DB::table('device')->where(['udid'=>$udid,'package_id'=>$package_id])->first();
         if($device&&$device->ipa_url!=''){
@@ -296,6 +376,22 @@ class AppleController extends Controller
             return response()->json(['status'=>0,'msg'=>'缺少参数！']);
         }
         $package = DB::table('package')->where(['id'=>$package_id])->first();
+
+        if($package->user_id<1){
+            fail('无效的包！');
+        }
+        //找出上传包的用户信息
+        $user = DB::table('users')->where(['id'=>$package->user_id])->first();
+        if($package->is_super==1) {
+            if ($user->download_package_num < 1) {
+                fail('下载次数不足，请充值！');
+            }
+        }
+        if($package->is_super==2){
+            if($user->sign_num<1){
+                fail('签名次数不足，请充值！');
+            }
+        }
         return response()->json(['status'=>1,'data'=>$package]);
 
     }
@@ -315,6 +411,9 @@ class AppleController extends Controller
     }
 
     public function generateXml(Request $request){
+        $ch=curl_init();
+
+        print_r('22');die;
         $url = 'https://p14fc.cn/udid/receive.php?package_id=82';
         $xml ='<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
