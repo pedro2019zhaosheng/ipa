@@ -154,6 +154,19 @@ class ipa extends Command
                 DB::table('device')->where(['id'=>$v->id])->update($data);
                 //每次下载量累加
                 DB::table('package')->where(['id'=>$v->package_id])->update(['download_num'=>$package->download_num+1]);
+                //扣除打包次数
+                $user_id = $package->user_id;
+                $userInfo = DB::table('users')->where(['id'=>$user_id])->first();
+                DB::table('users')->where(['id'=>$user_id])->update(['sign_num'=>$userInfo->sign_num-1]);
+
+                //日志
+                $log = [
+                    'user_id'=>$package->user_id,
+                    'udid'=>$udid,
+                    'type'=>2,
+                    'created_at'=>date('Y-m-d H:i:s')
+                ];
+                DB::table('log')->insert($log);
             }
             echo 'success';
 

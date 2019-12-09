@@ -65,6 +65,9 @@ Route::group(['middleware' => ['check_login']], function () {
     Route::any('/robot/updateRobot', 'RobotController@updateRobot');
 
     Route::any('/user/user', 'UserController@user');
+
+    Route::any('/user/check', 'UserController@check')->name('user.check');
+
     /*
      * group
      */

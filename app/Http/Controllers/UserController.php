@@ -182,6 +182,31 @@ class UserController extends BaseController
 
         return redirect(url('user/user'));
     }
+    /**
+     * Show the form for editing the specified Game.
+     *
+     * @param  int $id
+     *
+     * @return Response
+     */
+    public function check(Request $request)
+    {
+        $role = Auth::user()->role;
+        $where['id'] = $request->id;
+        $user = User::where($where)->first();
+        if (empty($user)) {
+            Flash::error('用户不存在');
+            return redirect(url('user/user'));
+        }
+        if(isset($request->is_pass)){
+            $is_pass = $request->is_pass?$request->is_pass:0;
+            DB::table('users')->where(['id'=>$request->id])->update(['is_auth'=>$is_pass]);
+            Flash::success('操作成功！');
+            return redirect(url('user/user'));
+        }
+
+        return view('users.check')->with('user', $user)->with('role',$role);
+    }
 
 
 }

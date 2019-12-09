@@ -25,9 +25,9 @@ class UserController extends Controller
         if(!isset($request->mobile)||!$request->mobile){
            fail('缺少参数',new \stdClass());
         }
-        if(!isset($request->username)||!$request->username){
-           fail('缺少参数',new \stdClass());
-        }
+//        if(!isset($request->username)||!$request->username){
+//           fail('缺少参数',new \stdClass());
+//        }
         if(!isset($request->password)||!$request->password){
             fail('缺少参数',new \stdClass());
         }
@@ -42,7 +42,7 @@ class UserController extends Controller
             'token'=>md5($request->mobile),
             'password' => Hash::make($request->password),
             'name'=>$request->username,
-            'username'=>$request->username,
+            'username'=>$request->mobile,
             'email'=>$request->mobile.'@qq.com',
             'created_at'=>date('Y-m-d H:i:s')
         ];
@@ -97,22 +97,26 @@ class UserController extends Controller
         }
         $token = $request->token;
         $userInfo = DB::table('users')->where(['token'=>$token])->first();
+        $data = new \stdClass();
         if(!$userInfo){
             fail('用户不存在！');
         }else{
             //用户总下载数量
+            $data->username = $userInfo->username;
+            $data->is_auth = $userInfo->is_auth;
             $user_download_total = 0;
-            $userInfo->user_download_total = $user_download_total;
+            $data->user_download_total = $user_download_total;
             //已下载的次数
             $downlaod_num = 0;
-            $userInfo->downlaod_num = [
+            $data->downlaod_num = [
                 'total_num'=>$downlaod_num,
                 'today_num'=>0
             ];
+            $limit = $request->limit?$request->limit:10;
             //常用应用
-            $userPackage = DB::table('package')->where(['user_id'=>$userInfo->id])->orderBy('download_num','desc')->first();
-            $userInfo->userPackage = $userPackage;
-            success($userInfo);
+            $userPackage = DB::table('package')->where(['user_id'=>$userInfo->id])->orderBy('download_num','desc')->paginate($limit);
+            $data->userPackage = $userPackage;
+            success($data);
         }
     }
 
@@ -299,5 +303,12 @@ class UserController extends Controller
         }
     }
 
+    public function userInfo(Request $request){
+        if(!isset($request->token)||!$request->token){
+            fail('缺少参数');
+        }
+        $userInfo = DB::table('users')->where(['token'=>$request->token])->first();
+        success($userInfo);
+    }
 
 }

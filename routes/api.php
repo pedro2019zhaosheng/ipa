@@ -61,12 +61,17 @@ Route::any('user/uploadPackage','Api\UserController@uploadPackage')->name('uploa
 
 Route::any('user/packageList','Api\UserController@packageList')->name('packageList');//内测发布应用列表
 
+Route::any('user/userInfo','Api\UserController@userInfo')->name('userInfo');//获取用户信息
+
+
 
 //order
 Route::any('order/buyConfig','Api\OrderController@buyConfig')->name('buyConfig');//订单购买配置
 Route::any('order/makeOrder','Api\OrderController@makeOrder')->name('makeOrder');//下单
-Route::any('order/vacallback','Api\OrderController@vacallback')->name('vacallback');//订单回调
+Route::any('order/vacallback','Api\OrderController@vacallback')->name('vacallback');//支付宝订单回调
 Route::any('order/getOrderList','Api\OrderController@getOrderList')->name('getOrderList');//订单列表
+Route::any('order/bacallback','Api\OrderController@bacallback')->name('bacallback');//银联订单回调
+
 
 
 

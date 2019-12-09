@@ -20,7 +20,7 @@ class OrderController extends Controller
     {
         $this->chargeConfig =[
                 'download_config'=> [
-                    [
+                    'buy'=>[[
                         'id'=>1,
                         'num'=>100,
                         'desc'=>'',
@@ -47,7 +47,17 @@ class OrderController extends Controller
                         'give_num'=>20000,
                         'desc'=>'赠 20000 次',
                         'price'=>1500
-                    ],
+                    ]],
+                    'payment_type'=>[
+                        [
+                            'id'=>1,
+                            'name'=>'支付宝',
+                        ],
+                        [
+                            'id'=>2,
+                            'name'=>'银联',
+                        ]
+                    ]
                 ],
                 'sign_config'=>[
                 'product'=>'ios专属签名',
@@ -79,8 +89,18 @@ class OrderController extends Controller
                         'price'=>1000*15
                     ]
                 ],
-                'payment_type'=>1,
-                'payment_type_desc'=>'支付宝支付',
+                'payment_type'=>[
+                    [
+                        'id'=>1,
+                        'name'=>'支付宝',
+                    ],
+                    [
+                        'id'=>2,
+                        'name'=>'银联',
+                    ]
+
+                ],
+//                'payment_type_desc'=>'支付宝支付',
             ]
         ];
     }
@@ -121,6 +141,9 @@ class OrderController extends Controller
         $token = $request->token; //当前登录者user_id;
         $user = DB::table('users')->where('token', '=', $token)->first();
         $payment_type = $request->payment_type;
+        if(!in_array($payment_type,[1,2])){
+            fail('无效的支付方式',new \stdClass());
+        }
         $amount =$request->amount;
         $product_id = $request->product_id;
         $type = $request->type;
@@ -129,9 +152,8 @@ class OrderController extends Controller
                 fail('套餐不存在！');
             }
             $config = $type==1?$this->chargeConfig['download_config']:$this->chargeConfig['sign_config'];
-
             if($type==1){
-                $product = $config[$product_id-1];
+                $product = $config['buy'][$product_id-1];
                 $product_json = json_encode($product);
                 $product_num = $product['num']+$product['give_num'];
                 $amount = $product['price'];
@@ -177,51 +199,102 @@ class OrderController extends Controller
 
             $total_amount = 1/100;
             $ip = Tools::getIp();
-            $config = ['merchantId'=>123463, // ÓÃ»§id
-                'privateKey'=>'b280c2a39971229c6badb3c036828f39',  // ÓÃ»§ÃØÔ¿
-                'url'=>'http://47.75.164.152:18002/wxqr/', //ÏÂµ¥µØÖ·
-            ];
 
-            $data['merchantId'] = $config['merchantId'];
-            $data['notifyUrl'] = $_SERVER['HTTP_HOST'].'/order/vacallback';  //»Øµ÷µØÖ·
-            $data['outTradeNo'] = $order_id;  // ÓÃ»§¶©µ¥ºÅ
-            $data['price'] = $amount;       // ½ð¶î£¬µ¥Î»Ôª
-            $data['subject'] = 'vip充值';    // ±êÌâ
-            $data['info'] = 'vip充值';   // ÏêÏ¸ÐÅÏ¢
-            $data['userid'] = $userId;
-            $data['ip'] = $ip;
-            $data['type'] = 1;
-            $data['time'] = time();
-            $data['sig'] = md5($config['privateKey'].$data['price'].$data['time'].$config['merchantId'].$data['outTradeNo']);
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $config['url']);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            if($payment_type==1){
+                $config = ['merchantId'=>123463, // ÓÃ»§id
+                    'privateKey'=>'b280c2a39971229c6badb3c036828f39',  // ÓÃ»§ÃØÔ¿
+                    'url'=>'http://47.75.164.152:18002/wxqr/', //ÏÂµ¥µØÖ·
+                ];
+                $data['merchantId'] = $config['merchantId'];
+                $data['notifyUrl'] = $_SERVER['HTTP_HOST'].'/order/vacallback';  //»Øµ÷µØÖ·
+                $data['outTradeNo'] = $order_id;  // ÓÃ»§¶©µ¥ºÅ
+                $data['price'] = $amount;       // ½ð¶î£¬µ¥Î»Ôª
+                $data['subject'] = '365超级签充值';    // ±êÌâ
+                $data['info'] = '365超级签充值';   // ÏêÏ¸ÐÅÏ¢
+                $data['userid'] = $userId;
+                $data['ip'] = $ip;
+                $data['type'] = 1;
+                $data['time'] = time();
+                $data['sig'] = md5($config['privateKey'].$data['price'].$data['time'].$config['merchantId'].$data['outTradeNo']);
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $config['url']);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                'X-AjaxPro-Method:ShowList',
-                'User-Agent:Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36'
-            ));
-            $arr['data'] = base64_encode(json_encode($data));
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $arr);
-            curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                    'X-AjaxPro-Method:ShowList',
+                    'User-Agent:Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36'
+                ));
+                $arr['data'] = base64_encode(json_encode($data));
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $arr);
+                curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
 //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); //²»ÑéÖ¤Ö¤Êé
 //curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false); //²»ÑéÖ¤Ö¤Êé
 
-            $output = curl_exec($ch);
-            $error = curl_error($ch);
-            if ($error) {
-                var_dump(error);
-            }
-            curl_close($ch);
-            if($output){
-                $output =json_decode($output);
-                if($output->status<0){
-                    $url = '';
-                }else{
-                    $url = $output->url;
+                $output = curl_exec($ch);
+                $error = curl_error($ch);
+                if ($error) {
+                    var_dump(error);
+                }
+                curl_close($ch);
+                if($output){
+                    $output =json_decode($output);
+                    if($output->status<0){
+                        $url = '';
+                    }else{
+                        $url = $output->url;
+                    }
                 }
             }
+
+            if($payment_type==2){
+                $config = ['merchantId'=>123463, // ÓÃ»§id
+                    'privateKey'=>'b280c2a39971229c6badb3c036828f39',  // ÓÃ»§ÃØÔ¿
+                    'url'=>'http://47.75.164.152:18002/bankpay/', //ÏÂµ¥µØÖ·
+                ];
+                $data['merchantId'] = $config['merchantId'];
+                $data['notifyUrl'] = $_SERVER['HTTP_HOST'].'/order/vacallback';  //回调地址
+                $data['userid'] = $userId;//用户id
+                $data['outTradeNo'] = time();  // 用户订单号
+                $data['price'] = $amount;       // 金额，单位元
+                $data['subject'] = '365超级签充值';    // 标题
+                $data['info'] = '365超级签充值';   // 详细信息
+                $data['time'] = time();
+                $data['sig'] = md5($config['privateKey'].$data['price'].$data['time'].$config['merchantId'].$data['outTradeNo']);
+
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $config['url']);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                    'X-AjaxPro-Method:ShowList',
+                    'User-Agent:Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36'
+                ));
+                $arr['data'] = base64_encode(json_encode($data));
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $arr);
+                curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); //不验证证书
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false); //不验证证书
+                $output = curl_exec($ch);
+
+                $error = curl_error($ch);
+                if ($error) {
+                    var_dump(error);
+                }
+                curl_close($ch);
+                if($output){
+                    $output =json_decode($output);
+                    if($output->status<0){
+                        $url = '';
+                    }else{
+                        $url = $output->url;
+                    }
+                }
+
+            }
+
+
 
             try{
                 DB::beginTransaction();
@@ -266,7 +339,10 @@ class OrderController extends Controller
         }
         success($orderList);
     }
-
+    /**
+     * @desc 支付宝回调地址
+     * @param order_id
+     */
     public function vacallback(Request $request){
         $config = ['merchantId'=>123463, // ÓÃ»§id
             'privateKey'=>'b280c2a39971229c6badb3c036828f39',  // ÓÃ»§ÃØÔ¿
@@ -282,6 +358,78 @@ class OrderController extends Controller
         //支付成功给vip用户加天数
         $orderModel = new Order();
         if ($data['sig'] == md5($config['privateKey'].$data['amount'].$data['time'].$config['merchantId'].$data['outTradeNo'])) {
+            $order = $orderModel::where('order_id',$data['outTradeNo'])->first();
+            if(!$order){
+                fail('无效订单');
+            }
+            $user = DB::table('users')->where('id', '=', $order->user_id)->first();
+            if (empty($user)) {
+                fail('没找到用户');
+            }
+
+            $price = $order->price;
+            if($price!=$_POST['price']){
+                $order->pay_amount = $_POST['price'];
+                $order->utime = date('Y-m-d H:i:s');
+                $order->ok_time = date('Y-m-d H:i:s');
+                $order->pay_time = date('Y-m-d H:i:s');
+                $order->status = 2;
+                $order->order_no =  $data['tradeNo'];
+                $order->save();
+                echo 1;die;
+            }
+            if($order){
+                $orderType = $order->order_type;
+                if(in_array($orderType,[1,2])){
+                    if($orderType==1){
+                        $userUpdateData = [
+                            'download_package_num'=>$order->product_num
+                        ];
+                    }
+                    if($orderType==2){
+                        $userUpdateData = [
+                            'sign_num'=>$order->product_num
+                        ];
+                    }
+                    DB::table('users')->where(['id'=>$order->user_id])->update($userUpdateData);
+                }
+            }
+
+            //实际支付金额
+            $order->pay_amount = $_POST['price'];
+            $order->utime = date('Y-m-d H:i:s');
+            $order->ok_time = date('Y-m-d H:i:s');
+            $order->pay_time = date('Y-m-d H:i:s');
+            $order->status = 1;
+            $order->order_no =  $data['tradeNo'];
+            $order->save();
+            $status = 1;
+        } else {
+            $status = 0;
+        }
+        echo $status;die;
+    }
+
+    /**
+     * @desc 银联回调地址
+     * @param order_id
+     */
+    public function bacallback(Request $request){
+        $config = ['merchantId'=>123463, // ÓÃ»§id
+            'privateKey'=>'b280c2a39971229c6badb3c036828f39',  // ÓÃ»§ÃØÔ¿
+            'url'=>'http://www.xxxx.com/index', //ÏÂµ¥µØÖ·
+        ];
+        $data['status'] = $_POST['status'];
+        $data['time'] = $_POST['time'];
+        $data['outTradeNo'] = $_POST['outTradeNo'];  // 商户单号
+        $data['amount'] = $_POST['price'];   // 充值金额
+        $data['sig'] = $_POST['sig'];       // 验证码
+        $data['tradeNo'] = $_POST['tradeNo'];     // 官方单号
+        $data['realprice'] = $_POST['realprice'];//真实支付金额，商家需要根据真实支付金额给用户回调上分
+//        file_put_contents('order.txt',json_encode($data));
+        //支付成功给vip用户加天数
+        $orderModel = new Order();
+        if ($data['sig'] == md5($config['privateKey'].$data['amount'].$data['time'].$config['merchantId'].$data['outTradeNo'].'0'.$data['realprice'])) {
             $order = $orderModel::where('order_id',$data['outTradeNo'])->first();
             if(!$order){
                 fail('无效订单');

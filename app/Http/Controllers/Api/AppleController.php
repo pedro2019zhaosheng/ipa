@@ -269,7 +269,17 @@ class AppleController extends Controller
                 file_put_contents($file,$plist);
                 $ipa_url = $_SERVER['SCHEME_URL'].'/udid/'.$package_id.'.plist';
                 $arr[] = $prefix.$ipa_url;
+                //扣除下载次数
                 DB::table('users')->where(['id'=>$user->id])->update(['download_package_num'=>$user->download_package_num-1]);
+                //日志
+                $log = [
+                    'user_id'=>$package->user_id,
+                    'package_id'=>$package_id,
+                    'udid'=>$udid,
+                    'type'=>1,
+                    'created_at'=>date('Y-m-d H:i:s')
+                ];
+                DB::table('log')->insert($log);
                 echo json_encode(['status'=>1,'url'=>$arr,'num'=>count($arr)]);die;
             }
         }
@@ -306,6 +316,17 @@ class AppleController extends Controller
 //                $prefix.'https://www.677677.club//applesign/rpaz23@163.com/CYL58XBX6H/0/9efa99314d8da5632a37dfa2abad6ac5cedb715e_20191120170719.plist',
 //                $prefix.'https://www.677677.club//applesign/ydoknm@163.com/WJ34XKGF7N/0/fca6d7087e100fa6087cd8c5dab72620559f91fe_20191120163729.plist'
 //            ];
+            //日志
+            //扣除下载次数
+            DB::table('users')->where(['id'=>$user->id])->update(['download_package_num'=>$user->download_package_num-1]);
+            $log = [
+                'user_id'=>$package->user_id,
+                'package_id'=>$package_id,
+                'udid'=>$udid,
+                'type'=>2,
+                'created_at'=>date('Y-m-d H:i:s')
+            ];
+            DB::table('log')->insert($log);
             echo json_encode(['status'=>1,'url'=>$arr,'num'=>count($arr)]);die;
             header("Location: $url");
             exit(0);
@@ -411,7 +432,8 @@ class AppleController extends Controller
     }
 
     public function generateXml(Request $request){
-        $ch=curl_init();
+       $img = QrCode::size(100)->color(0,0,0)->backgroundColor(0,255,0)->generate("www.baidu.com");
+        print_r($img);die;
 
         print_r('22');die;
         $url = 'https://p14fc.cn/udid/receive.php?package_id=82';
