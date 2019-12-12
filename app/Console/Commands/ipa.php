@@ -63,14 +63,21 @@ class ipa extends Command
             //处理apple账号数量超过99
             $appleId = $v->apple_id;
             if($v->apple_id>0){
-                $appleDeveloperInfo = DB::table('apple')->where(['id'=>$v->apple_id])->first();
+                if($package->apple_id>0){
+                    $appleId = $package->apple_id;
+                }else{
+                    $appleId =  $v->apple_id;
+                }
+                $appleDeveloperInfo = DB::table('apple')->where(['id'=>$appleId])->first();
             }
+
 //            else{
 //                $appleList = DB::table('apple')->where('udid_num','<',99)->get();
 //                $appleDeveloperInfo = $appleList[0];
 //                $appleId = $appleDeveloperInfo->id;
 //            }
 //            $buddle_id = $appleDeveloperInfo->buddle_id;//获取buddleID
+
             $account = $appleDeveloperInfo->account;
             $secret = $appleDeveloperInfo->secret_key;
             $certificate_id = $appleDeveloperInfo->certificate_id;
@@ -99,7 +106,6 @@ class ipa extends Command
 
             //第二步生成证书
             $stepTwoCmd = "$cmdRoot sudo  /bin/ruby saveCert.rb $account $secret $certificate_id $p12_url";
-
             exec($stepTwoCmd,$outTwo,$statusTwo);
             if($statusTwo!=0){
                 $stepOneCmd = "$cmdRoot sudo  /bin/ruby  /usr/local/homeroot/ipasign-master/nomysql/checkLogin.rb $account $secret";
@@ -113,6 +119,7 @@ class ipa extends Command
             //第三步将udid写入开发者账号
             $stepThreeCmd = "$cmdRoot sudo  /bin/ruby addUUid.rb $account $secret  $udid $buddle_id $certificate_id";
             exec($stepThreeCmd,$outThree,$statusThree);
+
 
             if($statusThree!=0){
                 exec($stepThreeCmd,$outThree,$forOut);
@@ -141,23 +148,28 @@ class ipa extends Command
                 // $plistUrl = "https://test.daoyuancloud.com/install_ipa/".$plistName;
                 $download_url = $scheme_url.$ipa;
                 $plistUrl = $scheme_url.$plist;
+                //扣除打包次数
+                $user_id = $package->user_id;
+                $userInfo = DB::table('users')->where(['id'=>$user_id])->first();
+                //获取已打包设备数量
+                $packge_num = DB::table('device')->where('package_id','=',$package->id)->where('is_reduce','=',0)->count();
+                DB::table('users')->where(['id'=>$user_id])->update(['sign_num'=>$userInfo->sign_num-$packge_num]);
                 $data = [
                     'apple_id'=>$appleId,
-                    'user_id'=>$appleDeveloperInfo->user_id,
+                    'user_id'=>$package->user_id,
                     'buddle_id'=>$buddle_id,
                     'package_id'=>$v->package_id,//todo
                     'udid'=>$udid,
+                    'is_reduce'=>1,
                     'ipa_url'=>$download_url,
                     'plist_url'=>$plistUrl,
                     'created_at'=>date('Y-m-d H:i:s')
                 ];
                 DB::table('device')->where(['id'=>$v->id])->update($data);
                 //每次下载量累加
-                DB::table('package')->where(['id'=>$v->package_id])->update(['download_num'=>$package->download_num+1]);
-                //扣除打包次数
-                $user_id = $package->user_id;
-                $userInfo = DB::table('users')->where(['id'=>$user_id])->first();
-                DB::table('users')->where(['id'=>$user_id])->update(['sign_num'=>$userInfo->sign_num-1]);
+//                DB::table('package')->where(['id'=>$v->package_id])->update(['download_num'=>$package->download_num+1]);
+
+
 
                 //日志
                 $log = [

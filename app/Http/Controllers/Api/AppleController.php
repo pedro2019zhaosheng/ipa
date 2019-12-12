@@ -139,7 +139,7 @@ class AppleController extends Controller
             if($user->download_package_num<1){
                 fail('下载次数不足，请充值！');
             }else{
-                success();
+                success('',[]);
             }
         }
         if($package->is_super==2){

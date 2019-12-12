@@ -18,8 +18,8 @@ class Sms extends Model
     protected $primaryKey = 'id';
     const SENDURL = 'http://api.qirui.com:7891/mt';
 
-    private $apiKey = '501375590001';
-    private $apiSecret = 'FCF8B9E5B8240587697AE9C293953564';
+    private $apiKey = '2274150010';
+    private $apiSecret = '9d577e338d7951112021';
 
     /**
     * 构造方法

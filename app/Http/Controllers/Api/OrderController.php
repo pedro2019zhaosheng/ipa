@@ -23,7 +23,7 @@ class OrderController extends Controller
                     'buy'=>[[
                         'id'=>1,
                         'num'=>100,
-                        'desc'=>'',
+                        'desc'=>'100',
                         'give_num'=>0,
                         'price'=>10
                     ],
@@ -31,21 +31,21 @@ class OrderController extends Controller
                         'id'=>2,
                         'num'=>10000,
                         'give_num'=>1000,
-                        'desc'=>'赠 1000 次',
+                        'desc'=>'10000'.PHP_EOL.'(赠 1000 次)',
                         'price'=>100
                     ],
                     [
                         'id'=>3,
                         'num'=>100000,
                         'give_num'=>10000,
-                        'desc'=>'赠 10000 次',
+                        'desc'=>'100000'.PHP_EOL.'(赠 10000 次)',
                         'price'=>900
                     ],
                     [
                         'id'=>4,
                         'num'=>200000,
                         'give_num'=>20000,
-                        'desc'=>'赠 20000 次',
+                        'desc'=>'200000'.PHP_EOL.'(赠 20000 次)',
                         'price'=>1500
                     ]],
                     'payment_type'=>[
@@ -121,7 +121,7 @@ class OrderController extends Controller
        }else{
            $data = $this->chargeConfig['sign_config'];
        }
-       success($data);
+       success('',$data);
    }
 
     /*
@@ -148,7 +148,7 @@ class OrderController extends Controller
         $product_id = $request->product_id;
         $type = $request->type;
         if(in_array($type,[1,2])){
-            if(!in_array($product_id,[1,2,3,4])){
+            if(!in_array($product_id,[1,2,3,4,5,6,7,8])){
                 fail('套餐不存在！');
             }
             $config = $type==1?$this->chargeConfig['download_config']:$this->chargeConfig['sign_config'];
@@ -159,7 +159,7 @@ class OrderController extends Controller
                 $amount = $product['price'];
             }
             if($type==2){
-                $product = $config['buy'][$product_id-1];
+                $product = $config['buy'][$product_id-5];
                 $product_json = json_encode($product);
                 $product_num = $product['num'];
                 $amount = $product['price'];
@@ -306,7 +306,7 @@ class OrderController extends Controller
 
             if($orderModel->id>0){
                 $orderModel->url = $url;
-                success($orderModel);
+                success('',$orderModel);
             }else{
                 fail('订单生成失败！');
             }
@@ -337,7 +337,7 @@ class OrderController extends Controller
 //                $v['product_desc'] = $product_desc;
             }
         }
-        success($orderList);
+        success('',$orderList);
     }
     /**
      * @desc 支付宝回调地址
@@ -367,8 +367,9 @@ class OrderController extends Controller
                 fail('没找到用户');
             }
 
-            $price = $order->price;
+            $price = $order->amount;
             if($price!=$_POST['price']){
+                exit('2');
                 $order->pay_amount = $_POST['price'];
                 $order->utime = date('Y-m-d H:i:s');
                 $order->ok_time = date('Y-m-d H:i:s');
@@ -378,17 +379,19 @@ class OrderController extends Controller
                 $order->save();
                 echo 1;die;
             }
+
+
             if($order){
                 $orderType = $order->order_type;
                 if(in_array($orderType,[1,2])){
                     if($orderType==1){
                         $userUpdateData = [
-                            'download_package_num'=>$order->product_num
+                            'download_package_num'=>$order->product_num+$user->download_package_num
                         ];
                     }
                     if($orderType==2){
                         $userUpdateData = [
-                            'sign_num'=>$order->product_num
+                            'sign_num'=>$order->product_num+$user->sign_num
                         ];
                     }
                     DB::table('users')->where(['id'=>$order->user_id])->update($userUpdateData);
@@ -404,6 +407,7 @@ class OrderController extends Controller
             $order->order_no =  $data['tradeNo'];
             $order->save();
             $status = 1;
+
         } else {
             $status = 0;
         }

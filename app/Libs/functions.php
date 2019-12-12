@@ -144,12 +144,12 @@ function generateTree($array){
 }
 
 
- function success($data = [])
+ function success($msg = '成功',$data = [])
 {
     $result = [
         'status'  => 1,
 //            'code'    => 200,
-        'message' => '成功',
+        'message' => $msg?$msg:'成功',
         'data'    => $data,
     ];
     exit(json_encode($result));
@@ -214,4 +214,87 @@ function generateXml($data){
     //删除sign.mobileconfig
     exec("sudo rm -rf $file");
     return 1;
+}
+
+function generatePlist($package){
+    $package_id = $package['id'];
+    $prefix = 'itms-services://?action=download-manifest&url=';
+    $plist = '<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>items</key>
+        <array>
+                <dict>
+                        <key>assets</key>
+                        <array>
+                                <dict>
+                                        <key>kind</key>
+                                        <string>software-package</string>
+                                        <key>url</key>
+                                        <string>'.$package['ipa_url'].'</string>
+                                </dict>
+                        </array>
+                        <key>metadata</key>
+                        <dict>
+                                <key>bundle-identifier</key>
+                                <string>com.text.WWW.WeChatTiaoT.01</string>
+                                <key>bundle-version</key>
+                                <string>1.0</string>
+                                <key>kind</key>
+                                <string>software</string>
+                                <key>title</key>
+                                <string>WBF-Exchange</string>
+                        </dict>
+                </dict>
+        </array>
+</dict>
+</plist>
+';
+    $file = public_path().'/udid/'.$package_id.'.plist';
+    file_put_contents($file,$plist);
+    $ipa_url = $_SERVER['SCHEME_URL'].'/udid/'.$package_id.'.plist';
+    return $ipa_url;
+}
+
+
+
+function shortUrl($source, $url_long) {
+    $source = '1323983993';
+    // 参数检查
+    if (empty($source) || !$url_long) {
+        return false;
+    }
+    // 参数处理，字符串转为数组
+    if (!is_array($url_long)) {
+        $url_long = array($url_long);
+    }
+
+    // 拼接url_long参数请求格式
+    $url_param = array_map(function ($value) {
+        return '&url_long=' . urlencode($value);
+    }, $url_long);
+    $url_param = implode('', $url_param);
+
+    // 新浪生成短链接接口
+    $api = 'http://api.t.sina.com.cn/short_url/shorten.json';    // 请求url
+    $request_url = sprintf($api . '?source=%s%s', $source, $url_param);
+    $result = array();    // 执行请求
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_URL, $request_url);
+    $data = curl_exec($ch);
+    if ($error = curl_errno($ch)) {
+
+        return false;
+    }
+    curl_close($ch);
+    $result = json_decode($data, true);
+    print_r($result);die;
+
+    if (isset($result[0]['url_short'])) {
+        return $result[0]['url_short'];
+    } else {
+        return '';
+    }
 }

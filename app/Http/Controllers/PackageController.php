@@ -111,7 +111,7 @@ class PackageController extends AppBaseController
                 'name'=>$data['name'],
                 'is_push'=>isset($data['is_push'])?$data['is_push']:0,
                 'version'=>$data['version'],
-                'user_id'=>Auth::user()->id,
+//                'user_id'=>Auth::user()->id,
                 'is_binding'=>$data['is_binding'],
                 'created_at'=>date('Y-m-d H:i:s')
             ];

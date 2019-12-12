@@ -30,6 +30,7 @@ class CommonController extends Controller
         $mobile = $request->mobile;
         $sms = $smsModel->where(['mobile'=>$mobile])->first();
         $code =  rand(100000, 999999);
+
         $data = [
             'mobile'=>$request->mobile,
             'code'=>$code,
