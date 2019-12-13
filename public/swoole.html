@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    var wsServer = "wss://p14fc.cn:9502";
+    var webSocket = new WebSocket(wsServer);
+    webSocket.onopen = function (evt) {
+        console.log('连接成功');
+    }
+    webSocket.onclose = function (evt) {
+        console.log('关闭')
+    }
+    webSocket.onmessage = function (evt) {
+        console.log(evt.data)
+    }
+    webSocket.onerror = function (evt,e) {
+        console.log('error')
+    }
+</script>
+</body>
+</html>

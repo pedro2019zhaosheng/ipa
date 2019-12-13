@@ -35,14 +35,20 @@ class UserController extends Controller
         if(!isset($request->sms_code)||!$request->sms_code){
             fail('缺少参数',new \stdClass());
         }
+       $smsModel = new Sms();
+       $mobile = $request->mobile;
+       $sms = $smsModel->where(['mobile'=>$mobile])->first();
         if($request->sms_code!=9999){
             fail('验证码错误！',new \stdClass());
         }
-        $smsModel = new Sms();
-        $mobile = $request->mobile;
-        $sms = $smsModel->where(['mobile'=>$mobile])->first();
+
+
 //        if(strtotime($sms->expire_date)<time()){
 //            fail('验证码已过期，请重新发送！');
+//        }else{
+//            if($request->sms_code!=$sms->code){
+//                fail('验证码已过期，请重新发送！');
+//            }
 //        }
         $data = [
             'mobile'=>$request->mobile,
@@ -160,6 +166,7 @@ class UserController extends Controller
                 $filename = 'https://'.$_SERVER['HTTP_HOST'].'/storage/'.$filename;
                 //校验ipa包是否有效
                 if($request->type==1){
+
                     $ipa_root_path = public_path().'/storage/tmp';
                     if (!file_exists($ipa_root_path)){
                         mkdir ($ipa_root_path,0777,true);
@@ -173,12 +180,13 @@ class UserController extends Controller
                     $payloadRoot = "/usr/local/homeroot/ipa/public/storage/tmp/Payload";
                     //是否存在Payload
                     if (!file_exists($payloadRoot)){
+                        //删除无效ipa包
+                        exec($storageRoot." && rm -rf $ipa",$out,$status);
                         fail('无效的ipa包',[]);
                     }else{
                         //删除tmp
                         exec($tmp.' && rm -rf Payload',$ot,$st);
-                        //删除无效ipa包
-                        exec($storageRoot." && rm -rf $ipa",$out,$status);
+
                     }
                 }
 
@@ -264,6 +272,9 @@ class UserController extends Controller
         }else{
             if(!password_verify($request->origin_password,$userInfo->password)){
                 fail('账号密码不正确！');
+            }
+            if($request->new_password==''||$request->password==''){
+                fail('新密码不能为空！');
             }
             if($request->new_password!=$request->password){
                 fail('两次输入密码不一致！');
@@ -371,7 +382,7 @@ class UserController extends Controller
             $data['id'] = $id;
             //生成xml mobileconfig
             generateXml($data);
-            success(['','id'=>$id]);
+            success('',['id'=>$id]);
         }
     }
     /**

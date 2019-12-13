@@ -43,6 +43,10 @@ Route::any('apple/downStatistics','Api\AppleController@downStatistics')->name('d
 
 Route::any('apple/generateXml','Api\AppleController@generateXml')->name('generateXml');//下载统计
 
+Route::any('apple/generatePlist','Api\AppleController@generatePlist')->name('generatePlist');//下载统计
+
+
+
 Route::any('user/register','Api\UserController@register')->name('register');//注册
 
 Route::any('user/login','Api\UserController@login')->name('login');//登录

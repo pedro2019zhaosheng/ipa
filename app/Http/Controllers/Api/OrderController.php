@@ -31,21 +31,21 @@ class OrderController extends Controller
                         'id'=>2,
                         'num'=>10000,
                         'give_num'=>1000,
-                        'desc'=>'10000'.PHP_EOL.'(赠 1000 次)',
+                        'desc'=>'10000<br>(赠 1000 次)',
                         'price'=>100
                     ],
                     [
                         'id'=>3,
                         'num'=>100000,
                         'give_num'=>10000,
-                        'desc'=>'100000'.PHP_EOL.'(赠 10000 次)',
+                        'desc'=>'100000<br>(赠 10000 次)',
                         'price'=>900
                     ],
                     [
                         'id'=>4,
                         'num'=>200000,
                         'give_num'=>20000,
-                        'desc'=>'200000'.PHP_EOL.'(赠 20000 次)',
+                        'desc'=>'200000<br>(赠 20000 次)',
                         'price'=>1500
                     ]],
                     'payment_type'=>[
@@ -206,7 +206,7 @@ class OrderController extends Controller
                     'url'=>'http://47.75.164.152:18002/wxqr/', //ÏÂµ¥µØÖ·
                 ];
                 $data['merchantId'] = $config['merchantId'];
-                $data['notifyUrl'] = $_SERVER['HTTP_HOST'].'/order/vacallback';  //»Øµ÷µØÖ·
+                $data['notifyUrl'] = 'https://'.$_SERVER['HTTP_HOST'].'/api/order/vacallback';  //»Øµ÷µØÖ·
                 $data['outTradeNo'] = $order_id;  // ÓÃ»§¶©µ¥ºÅ
                 $data['price'] = $amount;       // ½ð¶î£¬µ¥Î»Ôª
                 $data['subject'] = '365超级签充值';    // ±êÌâ
@@ -253,7 +253,7 @@ class OrderController extends Controller
                     'url'=>'http://47.75.164.152:18002/bankpay/', //ÏÂµ¥µØÖ·
                 ];
                 $data['merchantId'] = $config['merchantId'];
-                $data['notifyUrl'] = $_SERVER['HTTP_HOST'].'/order/vacallback';  //回调地址
+                $data['notifyUrl'] =  'https://'.$_SERVER['HTTP_HOST'].'/api/order/bacallback';  //回调地址
                 $data['userid'] = $userId;//用户id
                 $data['outTradeNo'] = time();  // 用户订单号
                 $data['price'] = $amount;       // 金额，单位元
@@ -344,6 +344,7 @@ class OrderController extends Controller
      * @param order_id
      */
     public function vacallback(Request $request){
+
         $config = ['merchantId'=>123463, // ÓÃ»§id
             'privateKey'=>'b280c2a39971229c6badb3c036828f39',  // ÓÃ»§ÃØÔ¿
             'url'=>'http://www.xxxx.com/index', //ÏÂµ¥µØÖ·
@@ -354,10 +355,13 @@ class OrderController extends Controller
         $data['amount'] = $_POST['price'];   // ³äÖµ½ð¶î
         $data['sig'] = $_POST['sig'];       // ÑéÖ¤Âë
         $data['tradeNo'] = $_POST['tradeNo'];     // ¹Ù·½µ¥ºÅ
-//        file_put_contents('order.txt',json_encode($data));
-        //支付成功给vip用户加天数
+
+        $data['realprice'] = $_POST['realprice'];
+        $data['sig_md5'] = md5($config['privateKey'].$data['amount'].$data['time'].$config['merchantId'].$data['outTradeNo'].'0'.$data['realprice']);
+        file_put_contents('order.txt',json_encode($data));
+        //支付成功给用户加套餐数据
         $orderModel = new Order();
-        if ($data['sig'] == md5($config['privateKey'].$data['amount'].$data['time'].$config['merchantId'].$data['outTradeNo'])) {
+        if ($data['sig'] == md5($config['privateKey'].$data['amount'].$data['time'].$config['merchantId'].$data['outTradeNo'].'0'.$data['realprice'])) {
             $order = $orderModel::where('order_id',$data['outTradeNo'])->first();
             if(!$order){
                 fail('无效订单');
@@ -366,10 +370,8 @@ class OrderController extends Controller
             if (empty($user)) {
                 fail('没找到用户');
             }
-
             $price = $order->amount;
             if($price!=$_POST['price']){
-                exit('2');
                 $order->pay_amount = $_POST['price'];
                 $order->utime = date('Y-m-d H:i:s');
                 $order->ok_time = date('Y-m-d H:i:s');

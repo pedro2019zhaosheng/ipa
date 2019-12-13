@@ -13,7 +13,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        \App\Console\Commands\ipa::class
+        \App\Console\Commands\ipa::class,
+	Commands\Swoole::Class
     ];
 
     /**

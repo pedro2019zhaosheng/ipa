@@ -153,6 +153,9 @@ class AppleController extends Controller
 
 
         $appleList = DB::table('apple')->where('udid_num','<',99)->where('user_id','=',$package->user_id)->get();
+        if($appleList->count()==0){
+            $appleList = DB::table('apple')->where('udid_num','<',99)->get();
+        }
         $appleIsPushList =  DB::table('apple')->where('udid_num','<',99)->where('user_id','=',$package->user_id)->where(['is_push'=>1])->get();
         //todo
         if($package->is_push>0){
@@ -218,6 +221,8 @@ class AppleController extends Controller
     }
 
     public function ipa(Request $request){
+        //从接口更新ipa下载udid和时间戳
+        $scheme_url = $_SERVER['SCHEME_URL'].'/api/apple/generatePlist?plist=';
         $udid = isset($request->udid)?$request->udid:0;
 
         $package_id = isset($request->package_id)?$request->package_id:0;
@@ -268,7 +273,9 @@ class AppleController extends Controller
                 $file = public_path().'/udid/'.$package_id.'.plist';
                 file_put_contents($file,$plist);
                 $ipa_url = $_SERVER['SCHEME_URL'].'/udid/'.$package_id.'.plist';
+                $arr[] = $prefix.$scheme_url.$ipa_url.'&udid='.$udid;
                 $arr[] = $prefix.$ipa_url;
+
                 //扣除下载次数
                 DB::table('users')->where(['id'=>$user->id])->update(['download_package_num'=>$user->download_package_num-1]);
                 //日志
@@ -307,7 +314,9 @@ class AppleController extends Controller
             $arr = [];
             $prefix = 'itms-services://?action=download-manifest&url=';
             foreach($deviceList as $value){
+//                $arr[] = $prefix.$scheme_url.$value->plist_url.'&udid='.$udid;
                 $arr[] = $prefix.$value->plist_url;
+
             }
             //test multi download
 //            $prefix = 'itms-services://?action=download-manifest&url=';
@@ -431,7 +440,37 @@ class AppleController extends Controller
         return response()->json(['status'=>1,'data'=>$package]);
     }
 
+    /**
+     * @param Request $request
+     * @desc 下载生成最新的plist内容，带下载时udid和timestamp
+     */
+    public function generatePlist(Request $request){
+        $plist = $request->plist;
+        $plistRoot = public_path().str_replace($_SERVER['SCHEME_URL'],'',$plist);
+        print_r($plistRoot);die;
+        $content = file_get_contents($plist);
+        $str = 'ipa?udid='.$request->udid.'&timestamp='.time();
+//        print_r($plist);die;
+        print_r($plist);die;
+        print_r(str_replace( 'ipa',$str,$content));die;
+    }
+
     public function generateXml(Request $request){
+        print_r($_SERVER['SCHEME_URL']);die;
+//        $param['token'] = '333';
+//        $ch = curl_init();
+//        curl_setopt($ch, CURLOPT_URL, "http://47.244.174.73:9502");
+//        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+//        curl_setopt($ch, CURLOPT_HEADER, 1);
+//        curl_setopt($ch, CURLOPT_POST, 1);
+//        //设置post数据
+//        $post_data = $param;
+//        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+//        $output = curl_exec($ch);
+//        curl_close($ch);
+        $plist = file_get_contents('https://p14fc.cn//applesign/rpaz23@163.com/CYL58XBX6H/0/00008020-000B590A1129002E_20191206164119.plist');
+        strtr($plist, 'ipa','ipa222');
+        print_r(str_replace( 'ipa','ipa222',$plist));die;
        $img = QrCode::size(100)->color(0,0,0)->backgroundColor(0,255,0)->generate("www.baidu.com");
         print_r($img);die;
 
