@@ -172,13 +172,13 @@ class ipa extends Command
 
 
                 //日志
-                $log = [
-                    'user_id'=>$package->user_id,
-                    'udid'=>$udid,
-                    'type'=>2,
-                    'created_at'=>date('Y-m-d H:i:s')
-                ];
-                DB::table('log')->insert($log);
+//                $log = [
+//                    'user_id'=>$package->user_id,
+//                    'udid'=>$udid,
+//                    'type'=>2,
+//                    'created_at'=>date('Y-m-d H:i:s')
+//                ];
+//                DB::table('log')->insert($log);
             }
             echo 'success';
 

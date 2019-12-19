@@ -81,7 +81,7 @@ foreach($arrayCleaned as $elem){
 $params = 'package_id='.$_REQUEST['package_id'].'&apple_id='.$_SESSION['apple_id']."&UDID=".$UDID."&CHALLENGE=".$CHALLENGE."&DEVICE_NAME=".$DEVICE_NAME."&DEVICE_PR ODUCT=".$DEVICE_PRODUCT."&DEVICE_VERSION=".$DEVICE_VERSION;
 
 //header("Location: http://dev.skyfox.org/udid?data=".rawurlencode($params));
-//header('HTTP/1.1 301 Moved Permanently');
-header("Location: https://p14fc.cn/ipa?".$params);
+header('HTTP/1.1 301 Moved Permanently');
+header("Location: https://jjq365.cn/ipa/?".$params);
 //header("Location: http://192.168.0.100:8848/chaojiqian/index.html?".$params);
 ?>

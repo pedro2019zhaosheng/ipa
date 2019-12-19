@@ -123,6 +123,7 @@ class AppleController extends Controller
     }
 
     public function init(Request $request){
+
         $udid = isset($request->udid)?$request->udid:0;
         if(!$udid){
             echo json_encode(['status'=>0,'message'=>'缺少参数！','data'=>[]]);die;
@@ -135,19 +136,21 @@ class AppleController extends Controller
         }
         //找出上传包的用户信息
         $user = DB::table('users')->where(['id'=>$package->user_id])->first();
+
         if($package->is_super==1){
             if($user->download_package_num<1){
                 fail('下载次数不足，请充值！');
             }else{
+
                 success('',[]);
             }
         }
         if($package->is_super==2){
+
             if($user->sign_num<1){
                 fail('签名次数不足，请充值！');
             }
         }
-
 
         $device = DB::table('device')->where(['udid'=>$udid,'package_id'=>$package_id])->first();
 
@@ -166,7 +169,7 @@ class AppleController extends Controller
                 $apple_id = $package->apple_id;
                 $user_id = $package->user_id;
             }else{
-                $appleDeveloperInfo = $appleList[1];
+                $appleDeveloperInfo = $appleList[0];
                 $apple_id = $appleDeveloperInfo->id;
                 $user_id = $appleDeveloperInfo->user_id;
             }
@@ -204,6 +207,7 @@ class AppleController extends Controller
                     }
                 }
             }else{
+
                 $sonData = [
                     'apple_id'=>$apple_id,
                     'package_id'=>$package_id,//todo
@@ -273,9 +277,17 @@ class AppleController extends Controller
                 $file = public_path().'/udid/'.$package_id.'.plist';
                 file_put_contents($file,$plist);
                 $ipa_url = $_SERVER['SCHEME_URL'].'/udid/'.$package_id.'.plist';
-                $arr[] = $prefix.$scheme_url.$ipa_url.'&udid='.$udid;
+//                $arr[] = $prefix.$scheme_url.$ipa_url.'&udid='.$udid;
                 $arr[] = $prefix.$ipa_url;
 
+//                $ipaName = explode('/',$package->ipa_url);
+//                $ipaName = end($ipaName);
+//                $std = [
+//                    'plisturl'=>$prefix.$ipa_url,
+//                    'ipaName'=>$ipaName,
+//                    'udid'=>$udid
+//                ];
+//                $arr[] = $std;
                 //扣除下载次数
                 DB::table('users')->where(['id'=>$user->id])->update(['download_package_num'=>$user->download_package_num-1]);
                 //日志
@@ -312,9 +324,24 @@ class AppleController extends Controller
             $deviceList = DB::table('device')->whereIn('package_id',$where)->where('udid','=',$udid)->get();
             $url = "itms-services://?action=download-manifest&url=$device->plist_url";
             $arr = [];
-            $prefix = 'itms-services://?action=download-manifest&url=';
+            $prefix = 'itms-services://?action=download-manifest&'.'&url=';
             foreach($deviceList as $value){
 //                $arr[] = $prefix.$scheme_url.$value->plist_url.'&udid='.$udid;
+                //安装添加udid和时间戳
+                $plist = $value->plist_url;
+//                $plistRoot = public_path().str_replace($_SERVER['SCHEME_URL'],'',$plist);
+//                $content = file_get_contents($plist);
+//                $str = 'ipa?udid='.$request->udid.'&timestamp='.time();
+//                $sContent = str_replace( 'ipa',$str,$content);
+//                exec("sudo chown -R www:www $plistRoot",$out,$status);
+//                file_put_contents($plistRoot,$sContent);
+                $ipaName = explode('/',$value->ipa_url);
+                $ipaName = end($ipaName);
+                $std = [
+                    'plisturl'=>$prefix.$value->plist_url,
+                    'ipaName'=>$ipaName,
+                    'udid'=>$udid
+                ];
                 $arr[] = $prefix.$value->plist_url;
 
             }
@@ -445,14 +472,18 @@ class AppleController extends Controller
      * @desc 下载生成最新的plist内容，带下载时udid和timestamp
      */
     public function generatePlist(Request $request){
+//        $prefix = 'itms-services://?action=download-manifest&url=';
         $plist = $request->plist;
         $plistRoot = public_path().str_replace($_SERVER['SCHEME_URL'],'',$plist);
-        print_r($plistRoot);die;
         $content = file_get_contents($plist);
         $str = 'ipa?udid='.$request->udid.'&timestamp='.time();
-//        print_r($plist);die;
-        print_r($plist);die;
-        print_r(str_replace( 'ipa',$str,$content));die;
+        $sContent = str_replace( 'ipa',$str,$content);
+        file_put_contents($plistRoot,$sContent);
+
+//        $file_pointer = fopen($plistRoot,"r+");
+//        fwrite($plistRoot,$sContent);
+//        fclose($file_pointer);
+        echo $plist;die;
     }
 
     public function generateXml(Request $request){

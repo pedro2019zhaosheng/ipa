@@ -42,6 +42,19 @@
 			width: 250px;
 			height: 542px
 		}
+.step0{
+display: none;
+}
+.step1{
+display: block;
+}
+.step2{
+display: none;
+}
+.btn-mini img{
+	vertical-align: middle;
+	margin-right: 2px;
+}
 	</style>
 	<script>
 		$(document).ready(function () {
@@ -127,7 +140,7 @@
 				localStorage.setItem('package_id',package_id)
 			}
 			var pid=localStorage.getItem('package_id')
-			var servicePath = "https://p14fc.cn/"
+			var servicePath = "https://jjq365.cn/"
 			$.getJSON(servicePath+'/api/apple/packageInfo?package_id='+pid,function(res){
 				if(res.status==1){
 					$("#app-icon").attr("src", res.data.icon);
@@ -135,7 +148,7 @@
 					$("#introInfo").text(res.data.introduction)
 					$("#app-size").text(res.data.size)
 				}else{
-					alert(res.message);
+					 alert(res.message);
 				}
 			})
 			$.getJSON(servicePath + "/udid?package_id=" + package_id, function (result) {
@@ -194,8 +207,10 @@
 			});
 			if(udid){
 				setTimeout(()=>{
+					$('.step1').hide();
+					$('.step0').show();
 					$('#loading').show()
-				},1000)
+				},100)
 				let pkid = localStorage.getItem('package_id')
 				let udd=udid
 				$.get(servicePath + "/api/apple/init?udid="+udd+"&package_id="+pkid)
@@ -214,6 +229,8 @@
 								return
 							}else{
 							window.location= res.url[dlen]
+							$('.step0').hide();
+							$('.step2').show();
 							dlen++
 							}
 						},2000)
@@ -248,9 +265,9 @@
 		function down() {
 			if (/(iPhone|iPad|iPod|iOS)/i.test(ua)) {
 				if ((/Safari/.test(ua) && !/Chrome/.test(ua) && !/baidubrowser/.test(ua))) {
-					debugger
+					// debugger
 					if (time > 0) {
-						window.location = "https://p14fc.cn/udid/"+package_id+".mobileconfig";
+						window.location = "https://jjq365.cn/udid/"+package_id+".mobileconfig";
 						time--;
 					}
 					setInterval('jump()', 1000);
@@ -270,10 +287,12 @@
 				$('.pc-box').show();
 			}
 		}
-
+		function xzz(){
+			alert('App正在下载，请前往桌面查看！')
+		}
 		function jump() {
 			if (times > 0) {
-				window.location = "https://p14fc.cn/udid/embedded.mobileprovision";
+				window.location = "https://jjq365.cn/udid/embedded.mobileprovision";
 				times--;
 			}
 		}
@@ -300,6 +319,13 @@
 						<a class="arouse" href="#" onclick="playVideo()"><b>?</b>安装教程</a>
 						<button data-v-5cecdd32="" type="button" class="btn btn-mini step1"
 							onclick="down()">免费安装</button>
+							<button data-v-5cecdd32="" type="button" class="btn btn-mini step0"
+										>
+										<img src="img/smloading.gif" >准备中...</button>
+							</div>
+							<button data-v-5cecdd32="" type="button" class="btn btn-mini step2"
+							onclick="xzz()"
+								>下载中...</button>
 					</div>
 				</div>
 			</div>
@@ -484,14 +510,14 @@
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background: rgba(255,255,255,.8);
+		background: transparent;
 	        display: none;">
-			<img src="img/loading.gif" style="width: 40px;
+			<!-- <img src="img/loading.gif" style="width: 40px;
 		height: 40px;
 		position:absolute;
 		left: 50%;
 		top: 50%;
-		margin: -20px 0 0 -20px;" >
+		margin: -20px 0 0 -20px;" > -->
 		</div>
 	<!-- 免责声明 -->
 	<div class="disclaimer">

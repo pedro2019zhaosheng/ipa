@@ -24,32 +24,33 @@ class UserController extends Controller
    public function register(Request $request){
 
         if(!isset($request->mobile)||!$request->mobile){
-           fail('缺少参数',new \stdClass());
+           fail('账号不能为空！',new \stdClass());
         }
 //        if(!isset($request->username)||!$request->username){
 //           fail('缺少参数',new \stdClass());
 //        }
         if(!isset($request->password)||!$request->password){
-            fail('缺少参数',new \stdClass());
+            fail('密码不能为空！',new \stdClass());
         }
         if(!isset($request->sms_code)||!$request->sms_code){
-            fail('缺少参数',new \stdClass());
+            fail('验证码不能为空！',new \stdClass());
         }
        $smsModel = new Sms();
        $mobile = $request->mobile;
        $sms = $smsModel->where(['mobile'=>$mobile])->first();
         if($request->sms_code!=9999){
-            fail('验证码错误！',new \stdClass());
+            if(strtotime($sms->expire_date)<time()){
+                fail('验证码已过期，请重新发送！');
+            }else{
+                if($request->sms_code!=$sms->code){
+                    fail('验证码不正确！');
+                }
+            }
+//            fail('验证码错误！',new \stdClass());
         }
 
 
-//        if(strtotime($sms->expire_date)<time()){
-//            fail('验证码已过期，请重新发送！');
-//        }else{
-//            if($request->sms_code!=$sms->code){
-//                fail('验证码已过期，请重新发送！');
-//            }
-//        }
+
         $data = [
             'mobile'=>$request->mobile,
             'token'=>md5($request->mobile),
@@ -92,7 +93,7 @@ class UserController extends Controller
            fail('账号密码不匹配');
         }else{
             if(!password_verify($request->password,$userInfo->password)){
-               fail('账号密码不正确！');
+               fail('密码不正确！');
             }else{
                 unset($userInfo->password);
                 success('',$userInfo);
@@ -124,7 +125,7 @@ class UserController extends Controller
             $end = date('Y-m-d 23:59:59');
             $data->downlaod_num = [
                 'total_num'=>$downlaod_num,
-                'today_num'=>DB::table('log')->where(['user_id'=>$userInfo->id,'type'=>1])->where('created_at','>=',$start)->where('created_at','<=',$end)->count(),
+                'today_num'=>DB::table('log')->where(['user_id'=>$userInfo->id])->where('created_at','>=',$start)->where('created_at','<=',$end)->count(),
             ];
             $limit = $request->limit?$request->limit:10;
             //常用应用
@@ -139,7 +140,6 @@ class UserController extends Controller
      *@param file
      */
     public function upload(Request $request){
-
         if ($request->isMethod('POST')){
             $file = $request->file('file');
             //判断文件是否上传成功
@@ -167,17 +167,17 @@ class UserController extends Controller
                 //校验ipa包是否有效
                 if($request->type==1){
 
-                    $ipa_root_path = public_path().'/storage/tmp';
+                    $ipa_root_path = storage_path().'/app/public/tmp';
+
                     if (!file_exists($ipa_root_path)){
                         mkdir ($ipa_root_path,0777,true);
                     } else {
                     }
                     $storageRoot = "cd /usr/local/homeroot/ipa/public/storage";
-                    $tmp = "cd /usr/local/homeroot/ipa/public/storage && cp $ipa tmp/. && cd tmp/";
-                    $cmd = "$tmp && unzip $ipa";
-
+                    $tmp = " cd /usr/local/homeroot/ipa/storage/app/public &&  cp $ipa tmp/. && cd tmp/";
+                    $cmd = "$tmp && sudo unzip $ipa";
                     exec($cmd,$out,$status);
-                    $payloadRoot = "/usr/local/homeroot/ipa/public/storage/tmp/Payload";
+                    $payloadRoot = "$ipa_root_path/Payload";
                     //是否存在Payload
                     if (!file_exists($payloadRoot)){
                         //删除无效ipa包
@@ -189,7 +189,6 @@ class UserController extends Controller
 
                     }
                 }
-
                 if($bool){
                     success('',['file'=>$filename]);
                 }else{
@@ -271,7 +270,7 @@ class UserController extends Controller
             fail('用户不存在！');
         }else{
             if(!password_verify($request->origin_password,$userInfo->password)){
-                fail('账号密码不正确！');
+                fail('原密码不正确！');
             }
             if($request->new_password==''||$request->password==''){
                 fail('新密码不能为空！');
@@ -309,8 +308,9 @@ class UserController extends Controller
             //通过url获取文件大小信息
 //            $ipa_url = 'http://p14fc.cn/storage/5de0bde5bcd9c.ipa';
             $ipa_url = $request->ipa_url;
-            $content = file_get_contents($ipa_url);
-            $filesize =  strlen($content );  //获取文件大小
+
+            $content = get_headers($ipa_url,true);
+            $filesize =  ($content['Content-Length']);  //获取文件大小
             $size =  round($filesize/1024/1024,2);
 //            require_once app_path().'/parse-app/ApkParser.php';
             $ipaArr = explode('/',$ipa_url);
@@ -319,9 +319,9 @@ class UserController extends Controller
             $ipa_root_path = public_path().'/storage/'.$ipa;
             //获取icon地址
             $unzipName =explode('.',$ipa)[0];
-            $cmd = "cd /usr/local/homeroot/ipa/public/storage && rm -rf Payload && mv $unzipName.ipa $unzipName.zip && unzip $unzipName.zip";
+            $cmd = "cd /usr/local/homeroot/ipa/public/storage && rm -rf Payload && cp $unzipName.ipa $unzipName.zip && unzip $unzipName.zip";
 
-            exec($cmd,$out,$status);
+//            exec($cmd,$out,$status);
             //获取文件夹
             $scanDir = '/usr/local/homeroot/ipa/public/storage/Payload';
             $ret = scandir($scanDir);
@@ -336,7 +336,7 @@ class UserController extends Controller
 //            }
 
             $resRoot = $scanDir.'/'.$app_name.'/AppIcon40x40@2x.png';
-            exec("cd /usr/local/homeroot/ipa/public/storage && sudo mv $resRoot $unzipName.png",$res,$status);
+//            exec("cd /usr/local/homeroot/ipa/public/storage && sudo mv $resRoot $unzipName.png",$res,$status);
             $icon = $_SERVER['SCHEME_URL'].'/storage/'."$unzipName.png";
             if($request->s_type==1){
 //                print_r("cd /usr/local/homeroot/ipa/public/storage && mv $resRoot $unzipName.png");die;
@@ -418,6 +418,10 @@ class UserController extends Controller
                 $root =public_path($qrcodeName);
                 QrCode::format('png')->size(200)->generate($url,$root);
                 $v->qrcode_url = $_SERVER['SCHEME_URL'].$qrcodeName;
+                $url = $v->download_url;
+                $api_url = "http://dogdwz.cn/tcnjson?url_long=$url";//todo
+                $short_url = file_get_contents($api_url);
+                $v->download_url = $short_url;
             }
             if($type==2){
                 //已下载的次数
@@ -452,6 +456,10 @@ class UserController extends Controller
             fail('缺少参数');
         }
         $info = DB::table('package')->where(['id'=>$request->id])->first();
+        if($info){
+            $num = DB::table('log')->where(['package_id'=>$info->id])->count();
+            $info->download_num = $num;
+        }
         $info->tt = shortUrl('', $info->download_url);
         if($request->s_type==1){
             $api = 'http://api.t.sina.com.cn/short_url/shorten.json'; // json

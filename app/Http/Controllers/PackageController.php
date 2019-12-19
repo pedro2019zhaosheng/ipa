@@ -53,8 +53,8 @@ class PackageController extends AppBaseController
         ));
         $server = $_SERVER;
 //        $domain = $server['REQUEST_SCHEME'].'://'.$server['HTTP_HOST'];
-	$domain = $server['SCHEME_URL'];
-	print_r($domain);
+        $domain = $server['SCHEME_URL'];
+//        print_r($domain);
         $user_id = Auth::user()->id;
         return view('package.index',compact('package','domain','role','user_id'));
     }
@@ -125,7 +125,7 @@ class PackageController extends AppBaseController
         if($data['id']>0){
             $id = $data['id'];
             //生成mobileconfig
-            $url = 'https://p14fc.cn/udid/receive.php?package_id='.$id;
+            $url =  $_SERVER['SCHEME_URL'].'/udid/receive.php?package_id='.$id;
             $xml ='<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -162,7 +162,7 @@ class PackageController extends AppBaseController
 ';
             $file = public_path().'/udid/'.$id.'.sign.mobileconfig';
             file_put_contents($file,$xml);
-            $cmdRoot = "sudo su && cd /usr/local/homeroot/ipasign-master/nomysql &&";
+            $cmdRoot = " cd /usr/local/homeroot/ipasign-master/nomysql &&";
             $cmd = "$cmdRoot   /usr/local/ruby-2.6.4/bin/ruby signMobileConfig.rb $file $id";
             @exec($cmd,$out,$status);
 
@@ -173,7 +173,7 @@ class PackageController extends AppBaseController
             Package::insert($package);
             $id = DB::getPdo()->lastInsertId();
             //生成mobileconfig
-            $url = 'https://p14fc.cn/udid/receive.php?package_id='.$id;
+            $url =  $_SERVER['SCHEME_URL'].'/udid/receive.php?package_id='.$id;
             $xml ='<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">

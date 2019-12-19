@@ -973,3 +973,16 @@ em {
 	top: 50%;
 	margin: -20px 0 0 -20px;
 }
+.step0{
+	display: none;
+}
+.step1{
+	display: block;
+}
+.step2{
+	display: none;
+}
+.btn-mini img{
+	vertical-align: middle;
+	margin-right: 2px;
+}

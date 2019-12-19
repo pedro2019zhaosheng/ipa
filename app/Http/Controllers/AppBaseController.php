@@ -64,7 +64,7 @@ class AppBaseController extends Controller
             $bool = $request->file('file')->move(public_path().'/storage/', $filename);
             //$bool = Storage::disk('public')->put($filename,file_get_contents($realPath));
             //判断是否上传成功
-            $filename = 'http://'.$_SERVER['HTTP_HOST'].'/storage/'.$filename;
+            $filename = 'https://'.$_SERVER['HTTP_HOST'].'/storage/'.$filename;
         }
         return $filename;
     }
@@ -91,7 +91,7 @@ class AppBaseController extends Controller
             $bool = $request->file('icon')->move(public_path().'/storage/', $filename);
             //$bool = Storage::disk('public')->put($filename,file_get_contents($realPath));
             //判断是否上传成功
-            $filename = 'http://'.$_SERVER['HTTP_HOST'].'/storage/'.$filename;
+            $filename = 'https://'.$_SERVER['HTTP_HOST'].'/storage/'.$filename;
         }
         return $filename;
     }

@@ -203,7 +203,7 @@ class OrderController extends Controller
             if($payment_type==1){
                 $config = ['merchantId'=>123463, // ÓÃ»§id
                     'privateKey'=>'b280c2a39971229c6badb3c036828f39',  // ÓÃ»§ÃØÔ¿
-                    'url'=>'http://47.75.164.152:18002/wxqr/', //ÏÂµ¥µØÖ·
+                    'url'=>'http://47.112.212.164:18002/wxqr/', //ÏÂµ¥µØÖ·
                 ];
                 $data['merchantId'] = $config['merchantId'];
                 $data['notifyUrl'] = 'https://'.$_SERVER['HTTP_HOST'].'/api/order/vacallback';  //»Øµ÷µØÖ·
@@ -250,7 +250,7 @@ class OrderController extends Controller
             if($payment_type==2){
                 $config = ['merchantId'=>123463, // ÓÃ»§id
                     'privateKey'=>'b280c2a39971229c6badb3c036828f39',  // ÓÃ»§ÃØÔ¿
-                    'url'=>'http://47.75.164.152:18002/bankpay/', //ÏÂµ¥µØÖ·
+                    'url'=>'http://47.112.212.164:18002/bankpay/', //ÏÂµ¥µØÖ·
                 ];
                 $data['merchantId'] = $config['merchantId'];
                 $data['notifyUrl'] =  'https://'.$_SERVER['HTTP_HOST'].'/api/order/bacallback';  //回调地址

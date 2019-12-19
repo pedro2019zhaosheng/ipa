@@ -8,6 +8,7 @@
         <tr>
         <th>ID</th>
         <th>安装包ID</th>
+        <th>ipa_url</th>
         <th>苹果账号ID</th>
         <th>设备ID</th>
         <th>创建时间</th>
@@ -20,6 +21,7 @@
         <tr>
             <td>{!! $data->id !!}</td>
             <td>{!! $data->package_id !!}</td>
+            <td>{!! $data->ipa_url !!}</td>
             <td>{!! $data->apple_id !!}</td>
             <td>
               {!! $data->udid !!}
